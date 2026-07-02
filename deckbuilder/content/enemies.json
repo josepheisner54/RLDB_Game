@@ -1,0 +1,41 @@
+{
+  "enemies": [
+    {"name": "Jaw Worm", "hp": [42, 50],
+     "intents": [
+       {"name": "Chomp",  "attack": 11, "hits": 1, "block": 0, "strength": 0, "heal": 0},
+       {"name": "Thrash", "attack": 7,  "hits": 1, "block": 5, "strength": 0, "heal": 0},
+       {"name": "Bellow", "attack": 0,  "hits": 0, "block": 6, "strength": 4, "heal": 0}],
+     "pattern": {"type": "weighted_random", "weights": [0.45, 0.30, 0.25], "max_repeat": 2}},
+
+    {"name": "Cultist", "hp": [48, 56],
+     "intents": [
+       {"name": "Incantation", "attack": 0, "hits": 0, "block": 0, "strength": 4, "heal": 0},
+       {"name": "Dark Strike", "attack": 6, "hits": 1, "block": 0, "strength": 0, "heal": 0}],
+     "pattern": {"type": "cycle"}},
+
+    {"name": "Blue Slaver", "hp": [46, 54],
+     "intents": [
+       {"name": "Stab", "attack": 12, "hits": 1, "block": 0, "strength": 0, "heal": 0},
+       {"name": "Rake", "attack": 8,  "hits": 1, "block": 3, "strength": 0, "heal": 0}],
+     "pattern": {"type": "weighted_random", "weights": [0.6, 0.4], "max_repeat": 2}},
+
+    {"name": "Sentry", "hp": [38, 45],
+     "intents": [
+       {"name": "Beam", "attack": 9, "hits": 1, "block": 0, "strength": 0, "heal": 0},
+       {"name": "Bolt", "attack": 5, "hits": 2, "block": 0, "strength": 0, "heal": 0}],
+     "pattern": {"type": "cycle"}},
+
+    {"name": "Gremlin Brute", "hp": [52, 60],
+     "intents": [
+       {"name": "Smash", "attack": 10, "hits": 1, "block": 0, "strength": 0, "heal": 0},
+       {"name": "Guard", "attack": 5,  "hits": 1, "block": 7, "strength": 0, "heal": 0}],
+     "pattern": {"type": "weighted_random", "weights": [0.65, 0.35], "max_repeat": 2}},
+
+    {"name": "Gremlin Nob", "hp": [70, 80],
+     "intents": [
+       {"name": "Bellow",     "attack": 0,  "hits": 0, "block": 0, "strength": 3, "heal": 0},
+       {"name": "Rush",       "attack": 14, "hits": 1, "block": 0, "strength": 0, "heal": 0},
+       {"name": "Skull Bash", "attack": 8,  "hits": 1, "block": 0, "strength": 0, "heal": 0}],
+     "pattern": {"type": "cycle"}}
+  ]
+}

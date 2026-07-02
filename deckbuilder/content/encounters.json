@@ -1,0 +1,38 @@
+{
+  "fights": [
+    {
+      "pool": [
+        "Jaw Worm",
+        "Cultist",
+        "Sentry"
+      ],
+      "hp_scale": 1.3,
+      "atk_scale": 1.0
+    },
+    {
+      "pool": [
+        "Jaw Worm",
+        "Blue Slaver",
+        "Sentry",
+        "Cultist"
+      ],
+      "hp_scale": 1.8,
+      "atk_scale": 1.1
+    },
+    {
+      "pool": [
+        "Gremlin Nob",
+        "Gremlin Brute",
+        "Blue Slaver"
+      ],
+      "hp_scale": 1.9,
+      "atk_scale": 1.2
+    }
+  ],
+  "run": {
+    "n_fights": 3,
+    "post_fight_heal": 8,
+    "campfire_rest_heal": 27,
+    "n_offers": 3
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "cards": [
+    {"name": "Strike",        "cost": 1, "damage": 6,  "hits": 1, "block": 0, "vulnerable": 0, "weak": 0, "strength": 0, "upgrade": {"damage": 9}},
+    {"name": "Defend",        "cost": 1, "damage": 0,  "hits": 0, "block": 5, "vulnerable": 0, "weak": 0, "strength": 0, "upgrade": {"block": 8}},
+    {"name": "Bash",          "cost": 2, "damage": 8,  "hits": 1, "block": 0, "vulnerable": 2, "weak": 0, "strength": 0, "upgrade": {"damage": 10, "vulnerable": 3}},
+    {"name": "Cleave",        "cost": 1, "damage": 8,  "hits": 1, "block": 0, "vulnerable": 0, "weak": 0, "strength": 0, "upgrade": {"damage": 11}},
+    {"name": "Iron Wave",     "cost": 1, "damage": 5,  "hits": 1, "block": 5, "vulnerable": 0, "weak": 0, "strength": 0, "upgrade": {"damage": 7, "block": 7}},
+    {"name": "Pommel Strike", "cost": 1, "damage": 9,  "hits": 1, "block": 0, "vulnerable": 0, "weak": 0, "strength": 0, "upgrade": {"damage": 10}},
+    {"name": "Inflame",       "cost": 1, "damage": 0,  "hits": 0, "block": 0, "vulnerable": 0, "weak": 0, "strength": 2, "upgrade": {"strength": 3}},
+    {"name": "Heavy Blade",   "cost": 2, "damage": 14, "hits": 1, "block": 0, "vulnerable": 0, "weak": 0, "strength": 0, "upgrade": {"damage": 18}},
+    {"name": "Shrug It Off",  "cost": 1, "damage": 0,  "hits": 0, "block": 8, "vulnerable": 0, "weak": 0, "strength": 0, "upgrade": {"block": 11}},
+    {"name": "Twin Strike",   "cost": 1, "damage": 5,  "hits": 2, "block": 0, "vulnerable": 0, "weak": 0, "strength": 0, "upgrade": {"damage": 7}},
+    {"name": "Clothesline",   "cost": 2, "damage": 12, "hits": 1, "block": 0, "vulnerable": 0, "weak": 2, "strength": 0, "upgrade": {"damage": 14, "weak": 3}},
+    {"name": "Ember Slash",   "cost": 0, "damage": 10, "hits": 1, "block": 0, "vulnerable": 0, "weak": 0, "strength": 0, "upgrade": {"damage": 13}}
+  ]
+}

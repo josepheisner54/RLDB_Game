@@ -1,0 +1,19 @@
+[project]
+name = "deckbuilder"
+version = "0.3.0"
+description = "Hierarchical RL deckbuilder: JSON-driven content, two-agent architecture, value-function interface"
+requires-python = ">=3.10"
+dependencies = ["torch>=2.0", "matplotlib"]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["deckbuilder*"]
+
+[tool.setuptools.package-data]
+"deckbuilder.content" = ["*.json"]
