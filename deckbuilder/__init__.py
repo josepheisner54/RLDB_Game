@@ -8,3 +8,4 @@ from .agents.meta import MetaAgent, apply_draft, apply_campfire
 from .training.combat import train_combat, refine_value, eval_combat
 from .training.meta import train_meta, expected_future_value
 from .runs import simulate_runs
+from .diagnostics import baseline_comparison, decision_value_table, rest_probe

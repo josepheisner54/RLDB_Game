@@ -1,0 +1,17 @@
+name: tests
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install CPU torch (avoids the multi-GB CUDA wheels)
+        run: pip install torch --index-url https://download.pytorch.org/whl/cpu -q
+      - name: Install package + pytest
+        run: pip install -e . pytest -q
+      - name: Run the war-story regressions
+        run: python -m pytest tests/ -q
