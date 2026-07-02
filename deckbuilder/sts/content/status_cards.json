@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.0.0",
+  "cards": [
+    {
+      "id": "wound",
+      "name": "Wound",
+      "type": "status",
+      "cost": null,
+      "keywords": [
+        "unplayable"
+      ],
+      "text": "Unplayable."
+    },
+    {
+      "id": "dazed",
+      "name": "Dazed",
+      "type": "status",
+      "cost": null,
+      "keywords": [
+        "unplayable",
+        "ethereal"
+      ],
+      "text": "Unplayable. Ethereal."
+    },
+    {
+      "id": "burn",
+      "name": "Burn",
+      "type": "status",
+      "cost": null,
+      "keywords": [
+        "unplayable"
+      ],
+      "text": "Unplayable. At the end of your turn, take 2 damage.",
+      "end_of_turn": [
+        {
+          "op": "damage_self",
+          "amount": 2,
+          "damage_type": "card"
+        }
+      ]
+    },
+    {
+      "id": "burn_plus",
+      "name": "Burn+",
+      "type": "status",
+      "cost": null,
+      "keywords": [
+        "unplayable"
+      ],
+      "text": "Unplayable. At the end of your turn, take 4 damage.",
+      "end_of_turn": [
+        {
+          "op": "damage_self",
+          "amount": 4,
+          "damage_type": "card"
+        }
+      ]
+    },
+    {
+      "id": "slimed",
+      "name": "Slimed",
+      "type": "status",
+      "cost": 1,
+      "keywords": [
+        "exhaust"
+      ],
+      "text": "Exhaust.",
+      "effects": [
+        {
+          "op": "exhaust_self"
+        }
+      ]
+    }
+  ]
+}

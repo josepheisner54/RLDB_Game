@@ -1,0 +1,106 @@
+{
+  "schema_version": "1.0.0",
+  "scope": "Rules required by the Ironclad card set and Act 1 enemies. Relic-specific edge cases outside Burning Blood are not enumerated.",
+  "numeric_resolution": {
+    "ascension_maps": "Choose the value at the greatest numeric key not exceeding current ascension.",
+    "random_hp": "Uniform integer over the inclusive HP range after applying ascension.",
+    "damage_formula": [
+      "Start with card or move base damage.",
+      "Add Strength once per hit, or strength_multiplier times for effects such as Heavy Blade.",
+      "Apply all multiplicative modifiers as floating-point factors without intermediate rounding (Weak 0.75, Vulnerable 1.5).",
+      "Floor once at the end and clamp to at least 0.",
+      "Resolve each hit separately against Block and HP."
+    ],
+    "card_block_formula": [
+      "Start with printed/dynamic Block.",
+      "Add Dexterity for card-generated Block.",
+      "Apply Frail factor 0.75 without intermediate rounding.",
+      "Floor once at the end and clamp to at least 0.",
+      "Block from powers such as Metallicize is not modified by Dexterity or Frail."
+    ],
+    "hp_loss_vs_damage": "Lose HP bypasses Block. Damage is absorbed by Block first unless its damage type explicitly bypasses Block."
+  },
+  "zones": {
+    "draw_pile": "Ordered; index 0 is top.",
+    "hand": {
+      "max_size": 10,
+      "overflow_draw": "A card drawn while the hand is full is placed into the discard pile."
+    },
+    "discard_pile": "Unordered for game logic except deterministic replay bookkeeping.",
+    "exhaust_pile": "Cards remain unavailable for the combat unless an effect retrieves them.",
+    "limbo": "A played card leaves the hand before its effects resolve."
+  },
+  "combat_setup": [
+    "Instantiate combat copies of the master deck, preserving permanent upgrades and misc values.",
+    "Shuffle while guaranteeing Innate cards at the top, draw the normal opening hand (default 5), then continue drawing remaining Innate cards until none remain on top or the hand reaches its size limit. If more than 10 Innate cards exist, excess Innates remain on top of the draw pile.",
+    "Roll enemy HP and spawn-time random values, apply spawn powers, and choose initial intents.",
+    "Apply pre-combat relic and power effects.",
+    "Set player energy to base energy per turn (Ironclad default 3)."
+  ],
+  "draw_and_shuffle": {
+    "draw_one": "If the draw pile is empty and the discard pile is nonempty, shuffle the discard pile into a new draw pile, then draw. If both are empty, draw fails.",
+    "multi_draw": "Resolve one card at a time, including reshuffles and on-draw triggers between cards.",
+    "no_draw": "While No Draw is active, draw effects fail. Battle Trance draws first and applies No Draw afterward."
+  },
+  "card_play_pipeline": [
+    "Validate target, playable_if, Entangled restriction, hand membership, and energy.",
+    "For X-cost cards, snapshot and spend all currently available Energy; X equals the amount spent unless modified by another effect.",
+    "Spend cost and move the card from hand to limbo.",
+    "Fire card-play triggers. Examples: Rage, Gremlin Nob Enrage, and Guardian Sharp Hide.",
+    "Resolve the card effects in listed order, draining queued reactions after each atomic effect unless the effect declares a batch capture.",
+    "Power cards enter the player power zone. A non-Power card still in limbo goes to Exhaust only when an explicit exhaust_self action or exhaust_on_use modifier applies; otherwise it goes to discard.",
+    "Corruption sets Skill cost to 0 while active and causes each played Skill to Exhaust after resolution."
+  ],
+  "player_turn": {
+    "start": [
+      "Remove player Block unless a retention effect such as Barricade prevents it.",
+      "Refill Energy to base energy, then apply start-of-turn Energy effects such as Berserk.",
+      "Resolve start-of-turn powers and relics.",
+      "Draw the normal hand amount (default 5), modified by draw effects."
+    ],
+    "end": [
+      "Resolve pre-card end-of-turn triggers (for this subset, Metallicize-class Block effects).",
+      "Resolve end-of-turn effects of cards currently in hand, including Burn/Burn+ damage.",
+      "Resolve remaining end-of-turn powers, including Combust and temporary Strength Down.",
+      "Exhaust unplayed Ethereal cards still in hand.",
+      "Discard all remaining non-Retained cards.",
+      "Decrement player-owned duration debuffs such as Weak, Vulnerable, Frail, and Entangled at the end of the player turn."
+    ]
+  },
+  "enemy_turn": {
+    "ordering": "Living enemies act left-to-right.",
+    "per_enemy": [
+      "At the start of that enemy’s action, remove its Block unless retained.",
+      "Resolve its current intent and all resulting triggers.",
+      "Resolve end-of-turn powers for that enemy, including Ritual and Metallicize.",
+      "Decrement duration debuffs owned by that enemy.",
+      "Choose and expose its next intent, unless an immediate interrupt has already replaced it."
+    ]
+  },
+  "core_powers_and_keywords": {
+    "strength": "Adds its amount to every Attack hit before multiplicative modifiers. Negative Strength is allowed.",
+    "dexterity": "Adds its amount to Block generated by cards; negative Dexterity is allowed.",
+    "weak": "Attack damage dealt by the affected creature is multiplied by 0.75. Duration decreases at the end of that creature’s turn.",
+    "vulnerable": "Attack damage received by the affected creature is multiplied by 1.5. Duration decreases at the end of that creature’s turn.",
+    "frail": "Block generated by cards is multiplied by 0.75. Duration decreases at the end of that creature’s turn.",
+    "artifact": "Negates the next debuff application and loses one stack. This includes negative Strength/Dexterity, Weak, Vulnerable, Frail, Entangled, No Draw, and Strength Down.",
+    "ritual": "At the end of the owner’s turn, gain Strength equal to Ritual. Ritual itself does not decrement.",
+    "ethereal": "If the card remains in hand when Ethereal processing occurs at end of turn, Exhaust it.",
+    "exhaust": "Move the card to the Exhaust pile for the rest of combat and fire on-exhaust triggers.",
+    "innate": "Guaranteed in the opening hand. If Innate count exceeds the normal opening draw, continue drawing Innates up to the hand limit; any excess remain on top of the draw pile.",
+    "fatal": "Triggers only when that card’s damage kills a non-Minion enemy.",
+    "entangled": "The player cannot play Attack cards for the affected turn.",
+    "sharp_hide": "When the player plays an Attack card, deal the power amount to the player once, regardless of hit count.",
+    "enrage": "When the player plays a Skill, the owner gains Strength equal to Enrage.",
+    "curl_up": "After the first Attack card that deals HP damage to the Louse finishes resolving, gain the rolled Block once.",
+    "spore_cloud": "On death, apply its Vulnerable amount to the player.",
+    "split": "When a living split-capable slime reaches 50% max HP or lower, immediately replace its intent with Split."
+  },
+  "death_and_victory": [
+    "After each atomic damage/HP-loss effect, resolve deaths before later effects that require a living target.",
+    "A multi-hit attack stops targeting an enemy after it dies; random-target hits retarget among remaining living enemies.",
+    "Combat is won when no non-Minion living enemies remain. Remaining Minions flee.",
+    "Killing a Looter returns the gold that enemy actually stole; enemy escape removes it without returning that gold."
+  ],
+  "rng_note": "The JSON specifies legal moves, nominal weights, and history constraints. It is mechanically accurate but not guaranteed to reproduce the desktop game’s seeded RNG byte-for-byte, because the original uses separate RNG streams and some AI branches use implementation-specific fallback logic rather than generic rejection sampling."
+}

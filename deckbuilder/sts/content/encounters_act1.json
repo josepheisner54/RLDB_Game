@@ -1,0 +1,423 @@
+{
+  "schema_version": "1.0.0",
+  "game": "Slay the Spire 1",
+  "act": 1,
+  "selection_rules": {
+    "normal_encounters": {
+      "easy_pool_count": 3,
+      "counter_definition": "The first three non-elite normal combats actually entered in Act 1 use the easy pool; intervening shops, rests, and noncombat events do not consume the counter.",
+      "after_easy_pool": "Use hard_pool.",
+      "repeat_exclusion": "An encounter id is excluded if it appeared in either of the previous two normal encounters. Renormalize the remaining weights."
+    },
+    "elites": {
+      "choice": "uniform among eligible elite encounters",
+      "repeat_exclusion": "The immediately previous map-node elite encounter is excluded. Dead Adventurer is independent of this history."
+    },
+    "bosses": {
+      "choice": "uniform at act generation",
+      "visible_on_map": true
+    }
+  },
+  "pools": {
+    "easy_hallway": [
+      {
+        "encounter": "cultist_solo",
+        "weight": 2
+      },
+      {
+        "encounter": "jaw_worm_solo",
+        "weight": 2
+      },
+      {
+        "encounter": "two_louses",
+        "weight": 2
+      },
+      {
+        "encounter": "small_slimes",
+        "weight": 2
+      }
+    ],
+    "hard_hallway": [
+      {
+        "encounter": "gremlin_gang",
+        "weight": 2
+      },
+      {
+        "encounter": "large_slime",
+        "weight": 4
+      },
+      {
+        "encounter": "lots_of_slimes",
+        "weight": 2
+      },
+      {
+        "encounter": "blue_slaver_solo",
+        "weight": 4
+      },
+      {
+        "encounter": "red_slaver_solo",
+        "weight": 2
+      },
+      {
+        "encounter": "three_louses",
+        "weight": 4
+      },
+      {
+        "encounter": "two_fungi_beasts",
+        "weight": 4
+      },
+      {
+        "encounter": "exordium_thugs",
+        "weight": 3
+      },
+      {
+        "encounter": "exordium_wildlife",
+        "weight": 3
+      },
+      {
+        "encounter": "looter_solo",
+        "weight": 4
+      }
+    ],
+    "elite": [
+      {
+        "encounter": "gremlin_nob_elite",
+        "weight": 1
+      },
+      {
+        "encounter": "lagavulin_elite",
+        "weight": 1
+      },
+      {
+        "encounter": "three_sentries_elite",
+        "weight": 1
+      }
+    ],
+    "boss": [
+      {
+        "encounter": "slime_boss_boss",
+        "weight": 1
+      },
+      {
+        "encounter": "guardian_boss",
+        "weight": 1
+      },
+      {
+        "encounter": "hexaghost_boss",
+        "weight": 1
+      }
+    ]
+  },
+  "encounters": [
+    {
+      "id": "cultist_solo",
+      "display_name": "Cultist",
+      "kind": "fixed",
+      "enemies": [
+        {
+          "enemy": "cultist"
+        }
+      ]
+    },
+    {
+      "id": "jaw_worm_solo",
+      "display_name": "Jaw Worm",
+      "kind": "fixed",
+      "enemies": [
+        {
+          "enemy": "jaw_worm"
+        }
+      ]
+    },
+    {
+      "id": "two_louses",
+      "display_name": "2 Louses",
+      "kind": "generated",
+      "slots": [
+        {
+          "choose_uniform": [
+            "red_louse",
+            "green_louse"
+          ]
+        },
+        {
+          "choose_uniform": [
+            "red_louse",
+            "green_louse"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "small_slimes",
+      "display_name": "Small Slimes",
+      "kind": "choose_uniform_formation",
+      "formations": [
+        [
+          {
+            "enemy": "spike_slime_m"
+          },
+          {
+            "enemy": "acid_slime_s"
+          }
+        ],
+        [
+          {
+            "enemy": "acid_slime_m"
+          },
+          {
+            "enemy": "spike_slime_s"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "gremlin_gang",
+      "display_name": "Gremlin Gang",
+      "kind": "sample_without_replacement",
+      "count": 4,
+      "bag": [
+        "fat_gremlin",
+        "fat_gremlin",
+        "sneaky_gremlin",
+        "sneaky_gremlin",
+        "mad_gremlin",
+        "mad_gremlin",
+        "shield_gremlin",
+        "gremlin_wizard"
+      ],
+      "placement": "sample order is battlefield left-to-right order"
+    },
+    {
+      "id": "large_slime",
+      "display_name": "Large Slime",
+      "kind": "choose_uniform_formation",
+      "formations": [
+        [
+          {
+            "enemy": "acid_slime_l"
+          }
+        ],
+        [
+          {
+            "enemy": "spike_slime_l"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "lots_of_slimes",
+      "display_name": "Lots of Slimes",
+      "kind": "fixed",
+      "enemies": [
+        {
+          "enemy": "spike_slime_s"
+        },
+        {
+          "enemy": "acid_slime_s"
+        },
+        {
+          "enemy": "spike_slime_s"
+        },
+        {
+          "enemy": "acid_slime_s"
+        },
+        {
+          "enemy": "spike_slime_s"
+        }
+      ],
+      "implementation_notes": [
+        "Composition is exactly 3 Spike Slimes (S) and 2 Acid Slimes (S)."
+      ]
+    },
+    {
+      "id": "blue_slaver_solo",
+      "display_name": "Blue Slaver",
+      "kind": "fixed",
+      "enemies": [
+        {
+          "enemy": "blue_slaver"
+        }
+      ]
+    },
+    {
+      "id": "red_slaver_solo",
+      "display_name": "Red Slaver",
+      "kind": "fixed",
+      "enemies": [
+        {
+          "enemy": "red_slaver"
+        }
+      ]
+    },
+    {
+      "id": "three_louses",
+      "display_name": "3 Louses",
+      "kind": "generated",
+      "slots": [
+        {
+          "choose_uniform": [
+            "red_louse",
+            "green_louse"
+          ]
+        },
+        {
+          "choose_uniform": [
+            "red_louse",
+            "green_louse"
+          ]
+        },
+        {
+          "choose_uniform": [
+            "red_louse",
+            "green_louse"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "two_fungi_beasts",
+      "display_name": "2 Fungi Beasts",
+      "kind": "fixed",
+      "enemies": [
+        {
+          "enemy": "fungi_beast"
+        },
+        {
+          "enemy": "fungi_beast"
+        }
+      ]
+    },
+    {
+      "id": "exordium_thugs",
+      "display_name": "Exordium Thugs",
+      "kind": "generated",
+      "slots": [
+        {
+          "choose_uniform": [
+            "red_louse",
+            "green_louse",
+            "acid_slime_m",
+            "spike_slime_m"
+          ],
+          "role": "wildlife/front"
+        },
+        {
+          "choose_uniform": [
+            "looter",
+            "cultist",
+            "blue_slaver",
+            "red_slaver"
+          ],
+          "role": "humanoid/back"
+        }
+      ]
+    },
+    {
+      "id": "exordium_wildlife",
+      "display_name": "Exordium Wildlife",
+      "kind": "generated",
+      "slots": [
+        {
+          "choose_uniform": [
+            "fungi_beast",
+            "jaw_worm"
+          ]
+        },
+        {
+          "choose_uniform": [
+            "red_louse",
+            "green_louse",
+            "acid_slime_m",
+            "spike_slime_m"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "looter_solo",
+      "display_name": "Looter",
+      "kind": "fixed",
+      "enemies": [
+        {
+          "enemy": "looter"
+        }
+      ]
+    },
+    {
+      "id": "gremlin_nob_elite",
+      "display_name": "Gremlin Nob",
+      "kind": "fixed",
+      "enemies": [
+        {
+          "enemy": "gremlin_nob"
+        }
+      ]
+    },
+    {
+      "id": "lagavulin_elite",
+      "display_name": "Lagavulin",
+      "kind": "fixed",
+      "enemies": [
+        {
+          "enemy": "lagavulin"
+        }
+      ]
+    },
+    {
+      "id": "three_sentries_elite",
+      "display_name": "3 Sentries",
+      "kind": "fixed",
+      "enemies": [
+        {
+          "enemy": "sentry",
+          "ai_parameters": {
+            "first_move": "bolt"
+          }
+        },
+        {
+          "enemy": "sentry",
+          "ai_parameters": {
+            "first_move": "beam"
+          }
+        },
+        {
+          "enemy": "sentry",
+          "ai_parameters": {
+            "first_move": "bolt"
+          }
+        }
+      ]
+    },
+    {
+      "id": "slime_boss_boss",
+      "display_name": "Slime Boss",
+      "kind": "fixed",
+      "enemies": [
+        {
+          "enemy": "slime_boss"
+        }
+      ]
+    },
+    {
+      "id": "guardian_boss",
+      "display_name": "The Guardian",
+      "kind": "fixed",
+      "enemies": [
+        {
+          "enemy": "guardian"
+        }
+      ]
+    },
+    {
+      "id": "hexaghost_boss",
+      "display_name": "Hexaghost",
+      "kind": "fixed",
+      "enemies": [
+        {
+          "enemy": "hexaghost"
+        }
+      ]
+    }
+  ]
+}

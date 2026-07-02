@@ -73,3 +73,37 @@ Everything is weight-shared pointwise MLPs; no attention anywhere.
   pooling over (card-embedding, count) pairs; makes V card-pool-agnostic
 
 Both have documented stubs; both slot in without touching training loops.
+
+## STS: full-fidelity Slay the Spire Act 1 (`deckbuilder/sts/`)
+
+The bundle-driven engine: 75 Ironclad cards (150 rows with upgrades + 5
+statuses) compiled from an ordered effect DSL (31 ops) into batched tensor
+micro-programs; real card economy (draw/hand/discard/exhaust as count
+vectors, reshuffle, hand cap 10, ethereal, innate, X-costs); 34 powers with
+trigger hooks; 25 Act 1 enemies with their AI state machines (Curl Up,
+splits, Lagavulin sleep, Guardian mode shift, Nob enrage, Looter theft,
+Sentry artifact); all 20 encounters incl. multi-enemy, elites, and the three
+bosses; card rewards with the real drop tables and per-run pity offset; and
+an Act 1 run simulator (easy->hard pools, repeat exclusion, campfires).
+
+    from deckbuilder import sts
+    C = sts.load(ascension=0)          # ascension resolved at compile time
+    policy, V, _ = sts.train_combat(C, steps=2000, B=192)
+    V = sts.refine_value(C, policy, V)
+    meta, _ = sts.train_meta(C, V)
+    sts.simulate_runs(C, policy, meta, B=1000)
+
+Random-play sanity (starter deck, 68 HP): hallway fights winnable, Gremlin
+Gang 16%, elites ~0-4%, bosses 0% -- the canonical difficulty gradient.
+
+Documented approximations (each touches <=2 cards/enemies): piles are
+count-based, so "top of pile" ops act on a random pile card (Havoc,
+Headbutt); "choose a card" effects pick a random eligible card (Armaments,
+True Grit, Dual Wield, Warcry); Looter's branch is a coin flip; Searing
+Blow has two upgrade levels; Rampage's counter is shared per episode;
+batch-exhaust triggers fire amount x count; Feed heals without raising the
+run HP cap.
+
+GPU notes: policy logp graphs accumulate over every play of every turn;
+memory scales with B x N x E_MAX x hidden. B=128-256 with h=64 fits
+comfortably on a T4; drop B before dropping h.

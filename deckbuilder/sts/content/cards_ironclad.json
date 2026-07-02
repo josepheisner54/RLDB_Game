@@ -1,0 +1,3154 @@
+{
+  "schema_version": "1.0.0",
+  "game": "Slay the Spire 1",
+  "patch_family": "2.3.x / current StS1 rules",
+  "character": "ironclad",
+  "card_count": 75,
+  "effect_dsl_note": "Effects are ordered. A simulator must resolve each effect and its queued triggers before advancing unless an op explicitly captures a batch result.",
+  "cards": [
+    {
+      "id": "strike",
+      "name": "Strike",
+      "color": "ironclad",
+      "rarity": "basic",
+      "type": "attack",
+      "target": "enemy",
+      "cost": {
+        "base": 1,
+        "upgraded": 1
+      },
+      "keywords": [],
+      "base": {
+        "text": "Deal 6 damage.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 6
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Deal 9 damage.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 9
+          }
+        ]
+      }
+    },
+    {
+      "id": "defend",
+      "name": "Defend",
+      "color": "ironclad",
+      "rarity": "basic",
+      "type": "skill",
+      "target": "self",
+      "cost": {
+        "base": 1,
+        "upgraded": 1
+      },
+      "keywords": [],
+      "base": {
+        "text": "Gain 5 Block.",
+        "effects": [
+          {
+            "op": "gain_block",
+            "amount": 5
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Gain 8 Block.",
+        "effects": [
+          {
+            "op": "gain_block",
+            "amount": 8
+          }
+        ]
+      }
+    },
+    {
+      "id": "bash",
+      "name": "Bash",
+      "color": "ironclad",
+      "rarity": "basic",
+      "type": "attack",
+      "target": "enemy",
+      "cost": {
+        "base": 2,
+        "upgraded": 2
+      },
+      "keywords": [],
+      "base": {
+        "text": "Deal 8 damage. Apply 2 Vulnerable.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 8
+          },
+          {
+            "op": "apply_power",
+            "power": "vulnerable",
+            "amount": 2
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Deal 10 damage. Apply 3 Vulnerable.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 10
+          },
+          {
+            "op": "apply_power",
+            "power": "vulnerable",
+            "amount": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "anger",
+      "name": "Anger",
+      "color": "ironclad",
+      "rarity": "common",
+      "type": "attack",
+      "target": "enemy",
+      "cost": {
+        "base": 0,
+        "upgraded": 0
+      },
+      "keywords": [],
+      "base": {
+        "text": "Deal 6 damage. Add a copy of this card to your discard pile.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 6
+          },
+          {
+            "op": "create_copy",
+            "of": "self",
+            "destination": "discard_pile"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Deal 8 damage. Add a copy of this card to your discard pile.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 8
+          },
+          {
+            "op": "create_copy",
+            "of": "self",
+            "destination": "discard_pile"
+          }
+        ]
+      }
+    },
+    {
+      "id": "armaments",
+      "name": "Armaments",
+      "color": "ironclad",
+      "rarity": "common",
+      "type": "skill",
+      "target": "self",
+      "cost": {
+        "base": 1,
+        "upgraded": 1
+      },
+      "keywords": [],
+      "base": {
+        "text": "Gain 5 Block. Upgrade a card in your hand for the rest of combat.",
+        "effects": [
+          {
+            "op": "gain_block",
+            "amount": 5
+          },
+          {
+            "op": "upgrade_cards",
+            "zone": "hand",
+            "selection": "choose_one",
+            "duration": "combat"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Gain 5 Block. Upgrade all cards in your hand for the rest of combat.",
+        "effects": [
+          {
+            "op": "gain_block",
+            "amount": 5
+          },
+          {
+            "op": "upgrade_cards",
+            "zone": "hand",
+            "selection": "all",
+            "duration": "combat"
+          }
+        ]
+      }
+    },
+    {
+      "id": "body_slam",
+      "name": "Body Slam",
+      "color": "ironclad",
+      "rarity": "common",
+      "type": "attack",
+      "target": "enemy",
+      "cost": {
+        "base": 1,
+        "upgraded": 0
+      },
+      "keywords": [],
+      "base": {
+        "text": "Deal damage equal to your current Block.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": {
+              "dynamic": "player.block"
+            }
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Deal damage equal to your current Block.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": {
+              "dynamic": "player.block"
+            }
+          }
+        ]
+      },
+      "implementation_notes": [
+        "The dynamic value becomes the card base damage, then Strength, Weak, Vulnerable, and other attack modifiers apply normally."
+      ]
+    },
+    {
+      "id": "clash",
+      "name": "Clash",
+      "color": "ironclad",
+      "rarity": "common",
+      "type": "attack",
+      "target": "enemy",
+      "cost": {
+        "base": 0,
+        "upgraded": 0
+      },
+      "keywords": [],
+      "base": {
+        "text": "Can only be played if every card in your hand is an Attack. Deal 14 damage.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 14
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Can only be played if every card in your hand is an Attack. Deal 18 damage.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 18
+          }
+        ]
+      },
+      "playable_if": {
+        "all_cards_in_hand_have_type": "attack"
+      }
+    },
+    {
+      "id": "cleave",
+      "name": "Cleave",
+      "color": "ironclad",
+      "rarity": "common",
+      "type": "attack",
+      "target": "all_enemies",
+      "cost": {
+        "base": 1,
+        "upgraded": 1
+      },
+      "keywords": [],
+      "base": {
+        "text": "Deal 8 damage to ALL enemies.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 8,
+            "target": "all_enemies"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Deal 11 damage to ALL enemies.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 11,
+            "target": "all_enemies"
+          }
+        ]
+      }
+    },
+    {
+      "id": "clothesline",
+      "name": "Clothesline",
+      "color": "ironclad",
+      "rarity": "common",
+      "type": "attack",
+      "target": "enemy",
+      "cost": {
+        "base": 2,
+        "upgraded": 2
+      },
+      "keywords": [],
+      "base": {
+        "text": "Deal 12 damage. Apply 2 Weak.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 12
+          },
+          {
+            "op": "apply_power",
+            "power": "weak",
+            "amount": 2
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Deal 14 damage. Apply 3 Weak.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 14
+          },
+          {
+            "op": "apply_power",
+            "power": "weak",
+            "amount": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "flex",
+      "name": "Flex",
+      "color": "ironclad",
+      "rarity": "common",
+      "type": "skill",
+      "target": "self",
+      "cost": {
+        "base": 0,
+        "upgraded": 0
+      },
+      "keywords": [],
+      "base": {
+        "text": "Gain 2 Strength. At the end of your turn, lose 2 Strength.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "strength",
+            "amount": 2,
+            "target": "player"
+          },
+          {
+            "op": "apply_power",
+            "power": "strength_down",
+            "amount": 2,
+            "target": "player"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Gain 4 Strength. At the end of your turn, lose 4 Strength.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "strength",
+            "amount": 4,
+            "target": "player"
+          },
+          {
+            "op": "apply_power",
+            "power": "strength_down",
+            "amount": 4,
+            "target": "player"
+          }
+        ]
+      },
+      "implementation_notes": [
+        "Strength Down is a debuff and can be blocked by Artifact independently of the Strength gain."
+      ]
+    },
+    {
+      "id": "havoc",
+      "name": "Havoc",
+      "color": "ironclad",
+      "rarity": "common",
+      "type": "skill",
+      "target": "self",
+      "cost": {
+        "base": 1,
+        "upgraded": 0
+      },
+      "keywords": [
+        "exhaust"
+      ],
+      "base": {
+        "text": "Play the top card of your draw pile and Exhaust it.",
+        "effects": [
+          {
+            "op": "play_top_card",
+            "zone": "draw_pile",
+            "add_modifier": "exhaust_on_use"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Play the top card of your draw pile and Exhaust it.",
+        "effects": [
+          {
+            "op": "play_top_card",
+            "zone": "draw_pile",
+            "add_modifier": "exhaust_on_use"
+          }
+        ]
+      }
+    },
+    {
+      "id": "headbutt",
+      "name": "Headbutt",
+      "color": "ironclad",
+      "rarity": "common",
+      "type": "attack",
+      "target": "enemy",
+      "cost": {
+        "base": 1,
+        "upgraded": 1
+      },
+      "keywords": [],
+      "base": {
+        "text": "Deal 9 damage. Put a card from your discard pile on top of your draw pile.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 9
+          },
+          {
+            "op": "move_card",
+            "source": "discard_pile",
+            "destination": "draw_pile_top",
+            "selection": "choose_one"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Deal 12 damage. Put a card from your discard pile on top of your draw pile.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 12
+          },
+          {
+            "op": "move_card",
+            "source": "discard_pile",
+            "destination": "draw_pile_top",
+            "selection": "choose_one"
+          }
+        ]
+      }
+    },
+    {
+      "id": "heavy_blade",
+      "name": "Heavy Blade",
+      "color": "ironclad",
+      "rarity": "common",
+      "type": "attack",
+      "target": "enemy",
+      "cost": {
+        "base": 2,
+        "upgraded": 2
+      },
+      "keywords": [],
+      "base": {
+        "text": "Deal 14 damage. Strength affects this card 3 times.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 14,
+            "strength_multiplier": 3
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Deal 14 damage. Strength affects this card 5 times.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 14,
+            "strength_multiplier": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "iron_wave",
+      "name": "Iron Wave",
+      "color": "ironclad",
+      "rarity": "common",
+      "type": "attack",
+      "target": "enemy",
+      "cost": {
+        "base": 1,
+        "upgraded": 1
+      },
+      "keywords": [],
+      "base": {
+        "text": "Gain 5 Block. Deal 5 damage.",
+        "effects": [
+          {
+            "op": "gain_block",
+            "amount": 5
+          },
+          {
+            "op": "damage",
+            "amount": 5
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Gain 7 Block. Deal 7 damage.",
+        "effects": [
+          {
+            "op": "gain_block",
+            "amount": 7
+          },
+          {
+            "op": "damage",
+            "amount": 7
+          }
+        ]
+      }
+    },
+    {
+      "id": "perfected_strike",
+      "name": "Perfected Strike",
+      "color": "ironclad",
+      "rarity": "common",
+      "type": "attack",
+      "target": "enemy",
+      "cost": {
+        "base": 2,
+        "upgraded": 2
+      },
+      "keywords": [],
+      "base": {
+        "text": "Deal 6 damage. Deals 2 additional damage for ALL your cards containing “Strike”.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": {
+              "base": 6,
+              "plus_per_card_name_contains": {
+                "substring": "Strike",
+                "amount": 2,
+                "zones": [
+                  "hand",
+                  "draw_pile",
+                  "discard_pile"
+                ],
+                "include_played_card_if_matches": true
+              }
+            }
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Deal 6 damage. Deals 3 additional damage for ALL your cards containing “Strike”.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": {
+              "base": 6,
+              "plus_per_card_name_contains": {
+                "substring": "Strike",
+                "amount": 3,
+                "zones": [
+                  "hand",
+                  "draw_pile",
+                  "discard_pile"
+                ],
+                "include_played_card_if_matches": true
+              }
+            }
+          }
+        ]
+      },
+      "implementation_notes": [
+        "Count the played Perfected Strike itself even though the generic play pipeline has moved it to limbo. Exhausted Strike cards are not counted."
+      ]
+    },
+    {
+      "id": "pommel_strike",
+      "name": "Pommel Strike",
+      "color": "ironclad",
+      "rarity": "common",
+      "type": "attack",
+      "target": "enemy",
+      "cost": {
+        "base": 1,
+        "upgraded": 1
+      },
+      "keywords": [],
+      "base": {
+        "text": "Deal 9 damage. Draw 1 card.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 9
+          },
+          {
+            "op": "draw",
+            "amount": 1
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Deal 10 damage. Draw 2 cards.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 10
+          },
+          {
+            "op": "draw",
+            "amount": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "shrug_it_off",
+      "name": "Shrug It Off",
+      "color": "ironclad",
+      "rarity": "common",
+      "type": "skill",
+      "target": "self",
+      "cost": {
+        "base": 1,
+        "upgraded": 1
+      },
+      "keywords": [],
+      "base": {
+        "text": "Gain 8 Block. Draw 1 card.",
+        "effects": [
+          {
+            "op": "gain_block",
+            "amount": 8
+          },
+          {
+            "op": "draw",
+            "amount": 1
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Gain 11 Block. Draw 1 card.",
+        "effects": [
+          {
+            "op": "gain_block",
+            "amount": 11
+          },
+          {
+            "op": "draw",
+            "amount": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "sword_boomerang",
+      "name": "Sword Boomerang",
+      "color": "ironclad",
+      "rarity": "common",
+      "type": "attack",
+      "target": "random_enemy_each_hit",
+      "cost": {
+        "base": 1,
+        "upgraded": 1
+      },
+      "keywords": [],
+      "base": {
+        "text": "Deal 3 damage to a random enemy 3 times.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 3,
+            "hits": 3,
+            "target": "random_enemy_each_hit"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Deal 3 damage to a random enemy 4 times.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 3,
+            "hits": 4,
+            "target": "random_enemy_each_hit"
+          }
+        ]
+      }
+    },
+    {
+      "id": "thunderclap",
+      "name": "Thunderclap",
+      "color": "ironclad",
+      "rarity": "common",
+      "type": "attack",
+      "target": "all_enemies",
+      "cost": {
+        "base": 1,
+        "upgraded": 1
+      },
+      "keywords": [],
+      "base": {
+        "text": "Deal 4 damage and apply 1 Vulnerable to ALL enemies.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 4,
+            "target": "all_enemies"
+          },
+          {
+            "op": "apply_power",
+            "power": "vulnerable",
+            "amount": 1,
+            "target": "all_enemies"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Deal 7 damage and apply 1 Vulnerable to ALL enemies.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 7,
+            "target": "all_enemies"
+          },
+          {
+            "op": "apply_power",
+            "power": "vulnerable",
+            "amount": 1,
+            "target": "all_enemies"
+          }
+        ]
+      }
+    },
+    {
+      "id": "true_grit",
+      "name": "True Grit",
+      "color": "ironclad",
+      "rarity": "common",
+      "type": "skill",
+      "target": "self",
+      "cost": {
+        "base": 1,
+        "upgraded": 1
+      },
+      "keywords": [
+        "exhaust"
+      ],
+      "base": {
+        "text": "Gain 7 Block. Exhaust a random card in your hand.",
+        "effects": [
+          {
+            "op": "gain_block",
+            "amount": 7
+          },
+          {
+            "op": "exhaust_card",
+            "zone": "hand",
+            "selection": "random_one"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Gain 9 Block. Exhaust a card in your hand.",
+        "effects": [
+          {
+            "op": "gain_block",
+            "amount": 9
+          },
+          {
+            "op": "exhaust_card",
+            "zone": "hand",
+            "selection": "choose_one"
+          }
+        ]
+      }
+    },
+    {
+      "id": "twin_strike",
+      "name": "Twin Strike",
+      "color": "ironclad",
+      "rarity": "common",
+      "type": "attack",
+      "target": "enemy",
+      "cost": {
+        "base": 1,
+        "upgraded": 1
+      },
+      "keywords": [],
+      "base": {
+        "text": "Deal 5 damage twice.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 5,
+            "hits": 2
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Deal 7 damage twice.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 7,
+            "hits": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "warcry",
+      "name": "Warcry",
+      "color": "ironclad",
+      "rarity": "common",
+      "type": "skill",
+      "target": "self",
+      "cost": {
+        "base": 0,
+        "upgraded": 0
+      },
+      "keywords": [
+        "exhaust"
+      ],
+      "base": {
+        "text": "Draw 1 card. Put a card from your hand on top of your draw pile. Exhaust.",
+        "effects": [
+          {
+            "op": "draw",
+            "amount": 1
+          },
+          {
+            "op": "move_card",
+            "source": "hand",
+            "destination": "draw_pile_top",
+            "selection": "choose_one"
+          },
+          {
+            "op": "exhaust_self"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Draw 2 cards. Put a card from your hand on top of your draw pile. Exhaust.",
+        "effects": [
+          {
+            "op": "draw",
+            "amount": 2
+          },
+          {
+            "op": "move_card",
+            "source": "hand",
+            "destination": "draw_pile_top",
+            "selection": "choose_one"
+          },
+          {
+            "op": "exhaust_self"
+          }
+        ]
+      }
+    },
+    {
+      "id": "wild_strike",
+      "name": "Wild Strike",
+      "color": "ironclad",
+      "rarity": "common",
+      "type": "attack",
+      "target": "enemy",
+      "cost": {
+        "base": 1,
+        "upgraded": 1
+      },
+      "keywords": [],
+      "base": {
+        "text": "Deal 12 damage. Shuffle a Wound into your draw pile.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 12
+          },
+          {
+            "op": "create_card",
+            "card": "wound",
+            "destination": "draw_pile",
+            "placement": "shuffle"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Deal 17 damage. Shuffle a Wound into your draw pile.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 17
+          },
+          {
+            "op": "create_card",
+            "card": "wound",
+            "destination": "draw_pile",
+            "placement": "shuffle"
+          }
+        ]
+      }
+    },
+    {
+      "id": "battle_trance",
+      "name": "Battle Trance",
+      "color": "ironclad",
+      "rarity": "uncommon",
+      "type": "skill",
+      "target": "self",
+      "cost": {
+        "base": 0,
+        "upgraded": 0
+      },
+      "keywords": [],
+      "base": {
+        "text": "Draw 3 cards. You cannot draw additional cards this turn.",
+        "effects": [
+          {
+            "op": "draw",
+            "amount": 3
+          },
+          {
+            "op": "apply_power",
+            "power": "no_draw",
+            "amount": 1,
+            "target": "player",
+            "duration": "turn"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Draw 4 cards. You cannot draw additional cards this turn.",
+        "effects": [
+          {
+            "op": "draw",
+            "amount": 4
+          },
+          {
+            "op": "apply_power",
+            "power": "no_draw",
+            "amount": 1,
+            "target": "player",
+            "duration": "turn"
+          }
+        ]
+      }
+    },
+    {
+      "id": "blood_for_blood",
+      "name": "Blood for Blood",
+      "color": "ironclad",
+      "rarity": "uncommon",
+      "type": "attack",
+      "target": "enemy",
+      "cost": {
+        "base": 4,
+        "upgraded": 3
+      },
+      "keywords": [],
+      "base": {
+        "text": "Costs 1 less Energy for each time you lose HP this combat. Deal 18 damage.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 18
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Costs 1 less Energy for each time you lose HP this combat. Deal 22 damage.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 22
+          }
+        ]
+      },
+      "implementation_notes": [
+        "Effective cost is max(0, printed_cost - player.hp_loss_events_this_combat). Each event counts once regardless of HP amount."
+      ]
+    },
+    {
+      "id": "bloodletting",
+      "name": "Bloodletting",
+      "color": "ironclad",
+      "rarity": "uncommon",
+      "type": "skill",
+      "target": "self",
+      "cost": {
+        "base": 0,
+        "upgraded": 0
+      },
+      "keywords": [],
+      "base": {
+        "text": "Lose 3 HP. Gain 2 Energy.",
+        "effects": [
+          {
+            "op": "lose_hp",
+            "amount": 3,
+            "source": "card"
+          },
+          {
+            "op": "gain_energy",
+            "amount": 2
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Lose 3 HP. Gain 3 Energy.",
+        "effects": [
+          {
+            "op": "lose_hp",
+            "amount": 3,
+            "source": "card"
+          },
+          {
+            "op": "gain_energy",
+            "amount": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "burning_pact",
+      "name": "Burning Pact",
+      "color": "ironclad",
+      "rarity": "uncommon",
+      "type": "skill",
+      "target": "self",
+      "cost": {
+        "base": 1,
+        "upgraded": 1
+      },
+      "keywords": [
+        "exhaust"
+      ],
+      "base": {
+        "text": "Exhaust 1 card. Draw 2 cards.",
+        "effects": [
+          {
+            "op": "exhaust_card",
+            "zone": "hand",
+            "selection": "choose_one"
+          },
+          {
+            "op": "draw",
+            "amount": 2
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Exhaust 1 card. Draw 3 cards.",
+        "effects": [
+          {
+            "op": "exhaust_card",
+            "zone": "hand",
+            "selection": "choose_one"
+          },
+          {
+            "op": "draw",
+            "amount": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "carnage",
+      "name": "Carnage",
+      "color": "ironclad",
+      "rarity": "uncommon",
+      "type": "attack",
+      "target": "enemy",
+      "cost": {
+        "base": 2,
+        "upgraded": 2
+      },
+      "keywords": [
+        "ethereal"
+      ],
+      "base": {
+        "text": "Ethereal. Deal 20 damage.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 20
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Ethereal. Deal 28 damage.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 28
+          }
+        ]
+      }
+    },
+    {
+      "id": "combust",
+      "name": "Combust",
+      "color": "ironclad",
+      "rarity": "uncommon",
+      "type": "power",
+      "target": "self",
+      "cost": {
+        "base": 1,
+        "upgraded": 1
+      },
+      "keywords": [],
+      "base": {
+        "text": "At the end of your turn, lose 1 HP and deal 5 damage to ALL enemies.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "combust",
+            "amount": 5,
+            "hp_loss": 1,
+            "target": "player"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "At the end of your turn, lose 1 HP and deal 7 damage to ALL enemies.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "combust",
+            "amount": 7,
+            "hp_loss": 1,
+            "target": "player"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dark_embrace",
+      "name": "Dark Embrace",
+      "color": "ironclad",
+      "rarity": "uncommon",
+      "type": "power",
+      "target": "self",
+      "cost": {
+        "base": 2,
+        "upgraded": 1
+      },
+      "keywords": [],
+      "base": {
+        "text": "Whenever a card is Exhausted, draw 1 card.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "dark_embrace",
+            "amount": 1,
+            "target": "player"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Whenever a card is Exhausted, draw 1 card.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "dark_embrace",
+            "amount": 1,
+            "target": "player"
+          }
+        ]
+      }
+    },
+    {
+      "id": "disarm",
+      "name": "Disarm",
+      "color": "ironclad",
+      "rarity": "uncommon",
+      "type": "skill",
+      "target": "enemy",
+      "cost": {
+        "base": 1,
+        "upgraded": 1
+      },
+      "keywords": [
+        "exhaust"
+      ],
+      "base": {
+        "text": "Enemy loses 2 Strength. Exhaust.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "strength",
+            "amount": -2,
+            "target": "enemy"
+          },
+          {
+            "op": "exhaust_self"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Enemy loses 3 Strength. Exhaust.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "strength",
+            "amount": -3,
+            "target": "enemy"
+          },
+          {
+            "op": "exhaust_self"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dropkick",
+      "name": "Dropkick",
+      "color": "ironclad",
+      "rarity": "uncommon",
+      "type": "attack",
+      "target": "enemy",
+      "cost": {
+        "base": 1,
+        "upgraded": 1
+      },
+      "keywords": [],
+      "base": {
+        "text": "Deal 5 damage. If the enemy has Vulnerable, gain 1 Energy and draw 1 card.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 5
+          },
+          {
+            "op": "conditional",
+            "if_": {
+              "target_has_power": "vulnerable"
+            },
+            "then": [
+              {
+                "op": "gain_energy",
+                "amount": 1
+              },
+              {
+                "op": "draw",
+                "amount": 1
+              }
+            ]
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Deal 8 damage. If the enemy has Vulnerable, gain 1 Energy and draw 1 card.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 8
+          },
+          {
+            "op": "conditional",
+            "if_": {
+              "target_has_power": "vulnerable"
+            },
+            "then": [
+              {
+                "op": "gain_energy",
+                "amount": 1
+              },
+              {
+                "op": "draw",
+                "amount": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "dual_wield",
+      "name": "Dual Wield",
+      "color": "ironclad",
+      "rarity": "uncommon",
+      "type": "skill",
+      "target": "self",
+      "cost": {
+        "base": 1,
+        "upgraded": 1
+      },
+      "keywords": [],
+      "base": {
+        "text": "Create a copy of an Attack or Power card in your hand.",
+        "effects": [
+          {
+            "op": "copy_card",
+            "zone": "hand",
+            "selection": "choose_one",
+            "allowed_types": [
+              "attack",
+              "power"
+            ],
+            "copies": 1,
+            "destination": "hand"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Create 2 copies of an Attack or Power card in your hand.",
+        "effects": [
+          {
+            "op": "copy_card",
+            "zone": "hand",
+            "selection": "choose_one",
+            "allowed_types": [
+              "attack",
+              "power"
+            ],
+            "copies": 2,
+            "destination": "hand"
+          }
+        ]
+      }
+    },
+    {
+      "id": "entrench",
+      "name": "Entrench",
+      "color": "ironclad",
+      "rarity": "uncommon",
+      "type": "skill",
+      "target": "self",
+      "cost": {
+        "base": 2,
+        "upgraded": 1
+      },
+      "keywords": [],
+      "base": {
+        "text": "Double your current Block.",
+        "effects": [
+          {
+            "op": "multiply_block",
+            "factor": 2,
+            "target": "player"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Double your current Block.",
+        "effects": [
+          {
+            "op": "multiply_block",
+            "factor": 2,
+            "target": "player"
+          }
+        ]
+      }
+    },
+    {
+      "id": "evolve",
+      "name": "Evolve",
+      "color": "ironclad",
+      "rarity": "uncommon",
+      "type": "power",
+      "target": "self",
+      "cost": {
+        "base": 1,
+        "upgraded": 1
+      },
+      "keywords": [],
+      "base": {
+        "text": "Whenever you draw a Status, draw 1 card.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "evolve",
+            "amount": 1,
+            "target": "player"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Whenever you draw a Status, draw 2 cards.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "evolve",
+            "amount": 2,
+            "target": "player"
+          }
+        ]
+      }
+    },
+    {
+      "id": "feel_no_pain",
+      "name": "Feel No Pain",
+      "color": "ironclad",
+      "rarity": "uncommon",
+      "type": "power",
+      "target": "self",
+      "cost": {
+        "base": 1,
+        "upgraded": 1
+      },
+      "keywords": [],
+      "base": {
+        "text": "Whenever a card is Exhausted, gain 3 Block.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "feel_no_pain",
+            "amount": 3,
+            "target": "player"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Whenever a card is Exhausted, gain 4 Block.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "feel_no_pain",
+            "amount": 4,
+            "target": "player"
+          }
+        ]
+      }
+    },
+    {
+      "id": "fire_breathing",
+      "name": "Fire Breathing",
+      "color": "ironclad",
+      "rarity": "uncommon",
+      "type": "power",
+      "target": "self",
+      "cost": {
+        "base": 1,
+        "upgraded": 1
+      },
+      "keywords": [],
+      "base": {
+        "text": "Whenever you draw a Status or Curse card, deal 6 damage to ALL enemies.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "fire_breathing",
+            "amount": 6,
+            "target": "player"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Whenever you draw a Status or Curse card, deal 10 damage to ALL enemies.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "fire_breathing",
+            "amount": 10,
+            "target": "player"
+          }
+        ]
+      }
+    },
+    {
+      "id": "flame_barrier",
+      "name": "Flame Barrier",
+      "color": "ironclad",
+      "rarity": "uncommon",
+      "type": "skill",
+      "target": "self",
+      "cost": {
+        "base": 2,
+        "upgraded": 2
+      },
+      "keywords": [],
+      "base": {
+        "text": "Gain 12 Block. Whenever you are attacked this turn, deal 4 damage back.",
+        "effects": [
+          {
+            "op": "gain_block",
+            "amount": 12
+          },
+          {
+            "op": "apply_power",
+            "power": "flame_barrier",
+            "amount": 4,
+            "target": "player",
+            "duration": "turn"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Gain 16 Block. Whenever you are attacked this turn, deal 6 damage back.",
+        "effects": [
+          {
+            "op": "gain_block",
+            "amount": 16
+          },
+          {
+            "op": "apply_power",
+            "power": "flame_barrier",
+            "amount": 6,
+            "target": "player",
+            "duration": "turn"
+          }
+        ]
+      },
+      "implementation_notes": [
+        "Triggers once per incoming attack hit."
+      ]
+    },
+    {
+      "id": "ghostly_armor",
+      "name": "Ghostly Armor",
+      "color": "ironclad",
+      "rarity": "uncommon",
+      "type": "skill",
+      "target": "self",
+      "cost": {
+        "base": 1,
+        "upgraded": 1
+      },
+      "keywords": [
+        "ethereal"
+      ],
+      "base": {
+        "text": "Ethereal. Gain 10 Block.",
+        "effects": [
+          {
+            "op": "gain_block",
+            "amount": 10
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Ethereal. Gain 13 Block.",
+        "effects": [
+          {
+            "op": "gain_block",
+            "amount": 13
+          }
+        ]
+      }
+    },
+    {
+      "id": "hemokinesis",
+      "name": "Hemokinesis",
+      "color": "ironclad",
+      "rarity": "uncommon",
+      "type": "attack",
+      "target": "enemy",
+      "cost": {
+        "base": 1,
+        "upgraded": 1
+      },
+      "keywords": [],
+      "base": {
+        "text": "Lose 2 HP. Deal 15 damage.",
+        "effects": [
+          {
+            "op": "lose_hp",
+            "amount": 2,
+            "source": "card"
+          },
+          {
+            "op": "damage",
+            "amount": 15
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Lose 2 HP. Deal 20 damage.",
+        "effects": [
+          {
+            "op": "lose_hp",
+            "amount": 2,
+            "source": "card"
+          },
+          {
+            "op": "damage",
+            "amount": 20
+          }
+        ]
+      }
+    },
+    {
+      "id": "infernal_blade",
+      "name": "Infernal Blade",
+      "color": "ironclad",
+      "rarity": "uncommon",
+      "type": "skill",
+      "target": "self",
+      "cost": {
+        "base": 1,
+        "upgraded": 0
+      },
+      "keywords": [
+        "exhaust"
+      ],
+      "base": {
+        "text": "Add a random Attack into your hand. It costs 0 this turn. Exhaust.",
+        "effects": [
+          {
+            "op": "generate_random_card",
+            "type": "attack",
+            "pool": "current_character_reward_pool",
+            "destination": "hand",
+            "cost_for_turn": 0,
+            "excluded_card_ids": [
+              "feed",
+              "reaper",
+              "lesson_learned",
+              "bite",
+              "ritual_dagger",
+              "shiv",
+              "smite",
+              "through_violence"
+            ]
+          },
+          {
+            "op": "exhaust_self"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Add a random Attack into your hand. It costs 0 this turn. Exhaust.",
+        "effects": [
+          {
+            "op": "generate_random_card",
+            "type": "attack",
+            "pool": "current_character_reward_pool",
+            "destination": "hand",
+            "cost_for_turn": 0,
+            "excluded_card_ids": [
+              "feed",
+              "reaper",
+              "lesson_learned",
+              "bite",
+              "ritual_dagger",
+              "shiv",
+              "smite",
+              "through_violence"
+            ]
+          },
+          {
+            "op": "exhaust_self"
+          }
+        ]
+      },
+      "implementation_notes": [
+        "Uses the current character reward pool rather than Prismatic Shard colors. The excluded cards cannot be randomly generated in combat."
+      ]
+    },
+    {
+      "id": "inflame",
+      "name": "Inflame",
+      "color": "ironclad",
+      "rarity": "uncommon",
+      "type": "power",
+      "target": "self",
+      "cost": {
+        "base": 1,
+        "upgraded": 1
+      },
+      "keywords": [],
+      "base": {
+        "text": "Gain 2 Strength.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "strength",
+            "amount": 2,
+            "target": "player"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Gain 3 Strength.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "strength",
+            "amount": 3,
+            "target": "player"
+          }
+        ]
+      }
+    },
+    {
+      "id": "intimidate",
+      "name": "Intimidate",
+      "color": "ironclad",
+      "rarity": "uncommon",
+      "type": "skill",
+      "target": "all_enemies",
+      "cost": {
+        "base": 0,
+        "upgraded": 0
+      },
+      "keywords": [
+        "exhaust"
+      ],
+      "base": {
+        "text": "Apply 1 Weak to ALL enemies. Exhaust.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "weak",
+            "amount": 1,
+            "target": "all_enemies"
+          },
+          {
+            "op": "exhaust_self"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Apply 2 Weak to ALL enemies. Exhaust.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "weak",
+            "amount": 2,
+            "target": "all_enemies"
+          },
+          {
+            "op": "exhaust_self"
+          }
+        ]
+      }
+    },
+    {
+      "id": "metallicize",
+      "name": "Metallicize",
+      "color": "ironclad",
+      "rarity": "uncommon",
+      "type": "power",
+      "target": "self",
+      "cost": {
+        "base": 1,
+        "upgraded": 1
+      },
+      "keywords": [],
+      "base": {
+        "text": "At the end of your turn, gain 3 Block.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "metallicize",
+            "amount": 3,
+            "target": "player"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "At the end of your turn, gain 4 Block.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "metallicize",
+            "amount": 4,
+            "target": "player"
+          }
+        ]
+      }
+    },
+    {
+      "id": "power_through",
+      "name": "Power Through",
+      "color": "ironclad",
+      "rarity": "uncommon",
+      "type": "skill",
+      "target": "self",
+      "cost": {
+        "base": 1,
+        "upgraded": 1
+      },
+      "keywords": [],
+      "base": {
+        "text": "Add 2 Wounds into your hand. Gain 15 Block.",
+        "effects": [
+          {
+            "op": "create_card",
+            "card": "wound",
+            "amount": 2,
+            "destination": "hand"
+          },
+          {
+            "op": "gain_block",
+            "amount": 15
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Add 2 Wounds into your hand. Gain 20 Block.",
+        "effects": [
+          {
+            "op": "create_card",
+            "card": "wound",
+            "amount": 2,
+            "destination": "hand"
+          },
+          {
+            "op": "gain_block",
+            "amount": 20
+          }
+        ]
+      }
+    },
+    {
+      "id": "pummel",
+      "name": "Pummel",
+      "color": "ironclad",
+      "rarity": "uncommon",
+      "type": "attack",
+      "target": "enemy",
+      "cost": {
+        "base": 1,
+        "upgraded": 1
+      },
+      "keywords": [
+        "exhaust"
+      ],
+      "base": {
+        "text": "Deal 2 damage 4 times. Exhaust.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 2,
+            "hits": 4
+          },
+          {
+            "op": "exhaust_self"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Deal 2 damage 5 times. Exhaust.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 2,
+            "hits": 5
+          },
+          {
+            "op": "exhaust_self"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rage",
+      "name": "Rage",
+      "color": "ironclad",
+      "rarity": "uncommon",
+      "type": "skill",
+      "target": "self",
+      "cost": {
+        "base": 0,
+        "upgraded": 0
+      },
+      "keywords": [],
+      "base": {
+        "text": "Whenever you play an Attack this turn, gain 3 Block.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "rage",
+            "amount": 3,
+            "target": "player",
+            "duration": "turn"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Whenever you play an Attack this turn, gain 5 Block.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "rage",
+            "amount": 5,
+            "target": "player",
+            "duration": "turn"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rampage",
+      "name": "Rampage",
+      "color": "ironclad",
+      "rarity": "uncommon",
+      "type": "attack",
+      "target": "enemy",
+      "cost": {
+        "base": 1,
+        "upgraded": 1
+      },
+      "keywords": [],
+      "base": {
+        "text": "Deal 8 damage. Increase this card’s damage by 5 this combat.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": {
+              "dynamic": "this_card.combat_damage"
+            }
+          },
+          {
+            "op": "modify_card_for_combat",
+            "field": "combat_damage",
+            "add": 5,
+            "target": "self_instance"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Deal 8 damage. Increase this card’s damage by 8 this combat.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": {
+              "dynamic": "this_card.combat_damage"
+            }
+          },
+          {
+            "op": "modify_card_for_combat",
+            "field": "combat_damage",
+            "add": 8,
+            "target": "self_instance"
+          }
+        ]
+      },
+      "implementation_notes": [
+        "Initialize this_card.combat_damage to 8 at combat start or when the card instance is created."
+      ]
+    },
+    {
+      "id": "reckless_charge",
+      "name": "Reckless Charge",
+      "color": "ironclad",
+      "rarity": "uncommon",
+      "type": "attack",
+      "target": "enemy",
+      "cost": {
+        "base": 0,
+        "upgraded": 0
+      },
+      "keywords": [],
+      "base": {
+        "text": "Deal 7 damage. Shuffle a Dazed into your draw pile.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 7
+          },
+          {
+            "op": "create_card",
+            "card": "dazed",
+            "destination": "draw_pile",
+            "placement": "shuffle"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Deal 10 damage. Shuffle a Dazed into your draw pile.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 10
+          },
+          {
+            "op": "create_card",
+            "card": "dazed",
+            "destination": "draw_pile",
+            "placement": "shuffle"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rupture",
+      "name": "Rupture",
+      "color": "ironclad",
+      "rarity": "uncommon",
+      "type": "power",
+      "target": "self",
+      "cost": {
+        "base": 1,
+        "upgraded": 1
+      },
+      "keywords": [],
+      "base": {
+        "text": "Whenever you lose HP from a card, gain 1 Strength.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "rupture",
+            "amount": 1,
+            "target": "player"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Whenever you lose HP from a card, gain 2 Strength.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "rupture",
+            "amount": 2,
+            "target": "player"
+          }
+        ]
+      }
+    },
+    {
+      "id": "searing_blow",
+      "name": "Searing Blow",
+      "color": "ironclad",
+      "rarity": "uncommon",
+      "type": "attack",
+      "target": "enemy",
+      "cost": {
+        "base": 2,
+        "upgraded": 2
+      },
+      "keywords": [],
+      "base": {
+        "text": "Deal 12 damage. Can be upgraded any number of times.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": {
+              "formula": "12 + n*(n+7)/2",
+              "n": "upgrade_count"
+            }
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Deal 16 damage. Can be upgraded any number of times.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": {
+              "formula": "12 + n*(n+7)/2",
+              "n": "upgrade_count"
+            }
+          }
+        ]
+      },
+      "upgrade_rule": {
+        "unlimited": true,
+        "damage_at_upgrade_count_n": "12 + n*(n+7)/2",
+        "increment_for_next_upgrade": "n + 4, where n is the new upgrade count"
+      }
+    },
+    {
+      "id": "second_wind",
+      "name": "Second Wind",
+      "color": "ironclad",
+      "rarity": "uncommon",
+      "type": "skill",
+      "target": "self",
+      "cost": {
+        "base": 1,
+        "upgraded": 1
+      },
+      "keywords": [
+        "exhaust"
+      ],
+      "base": {
+        "text": "Exhaust all non-Attack cards in your hand and gain 5 Block for each card Exhausted.",
+        "effects": [
+          {
+            "op": "exhaust_cards",
+            "zone": "hand",
+            "filter": {
+              "type_not": "attack"
+            }
+          },
+          {
+            "op": "gain_block_per_result",
+            "amount": 5,
+            "result_of_previous_effect": "cards_exhausted"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Exhaust all non-Attack cards in your hand and gain 7 Block for each card Exhausted.",
+        "effects": [
+          {
+            "op": "exhaust_cards",
+            "zone": "hand",
+            "filter": {
+              "type_not": "attack"
+            }
+          },
+          {
+            "op": "gain_block_per_result",
+            "amount": 7,
+            "result_of_previous_effect": "cards_exhausted"
+          }
+        ]
+      }
+    },
+    {
+      "id": "seeing_red",
+      "name": "Seeing Red",
+      "color": "ironclad",
+      "rarity": "uncommon",
+      "type": "skill",
+      "target": "self",
+      "cost": {
+        "base": 1,
+        "upgraded": 0
+      },
+      "keywords": [
+        "exhaust"
+      ],
+      "base": {
+        "text": "Gain 2 Energy. Exhaust.",
+        "effects": [
+          {
+            "op": "gain_energy",
+            "amount": 2
+          },
+          {
+            "op": "exhaust_self"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Gain 2 Energy. Exhaust.",
+        "effects": [
+          {
+            "op": "gain_energy",
+            "amount": 2
+          },
+          {
+            "op": "exhaust_self"
+          }
+        ]
+      }
+    },
+    {
+      "id": "sentinel",
+      "name": "Sentinel",
+      "color": "ironclad",
+      "rarity": "uncommon",
+      "type": "skill",
+      "target": "self",
+      "cost": {
+        "base": 1,
+        "upgraded": 1
+      },
+      "keywords": [],
+      "base": {
+        "text": "Gain 5 Block. If this card is Exhausted, gain 2 Energy.",
+        "effects": [
+          {
+            "op": "gain_block",
+            "amount": 5
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Gain 8 Block. If this card is Exhausted, gain 3 Energy.",
+        "effects": [
+          {
+            "op": "gain_block",
+            "amount": 8
+          }
+        ]
+      },
+      "implementation_notes": [
+        "on_exhaust: gain 2 Energy (3 when upgraded), regardless of the source of Exhaust."
+      ]
+    },
+    {
+      "id": "sever_soul",
+      "name": "Sever Soul",
+      "color": "ironclad",
+      "rarity": "uncommon",
+      "type": "attack",
+      "target": "enemy",
+      "cost": {
+        "base": 2,
+        "upgraded": 2
+      },
+      "keywords": [
+        "exhaust"
+      ],
+      "base": {
+        "text": "Exhaust all non-Attack cards in your hand. Deal 16 damage.",
+        "effects": [
+          {
+            "op": "exhaust_cards",
+            "zone": "hand",
+            "filter": {
+              "type_not": "attack"
+            }
+          },
+          {
+            "op": "damage",
+            "amount": 16
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Exhaust all non-Attack cards in your hand. Deal 22 damage.",
+        "effects": [
+          {
+            "op": "exhaust_cards",
+            "zone": "hand",
+            "filter": {
+              "type_not": "attack"
+            }
+          },
+          {
+            "op": "damage",
+            "amount": 22
+          }
+        ]
+      }
+    },
+    {
+      "id": "shockwave",
+      "name": "Shockwave",
+      "color": "ironclad",
+      "rarity": "uncommon",
+      "type": "skill",
+      "target": "all_enemies",
+      "cost": {
+        "base": 2,
+        "upgraded": 2
+      },
+      "keywords": [
+        "exhaust"
+      ],
+      "base": {
+        "text": "Apply 3 Weak and Vulnerable to ALL enemies. Exhaust.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "weak",
+            "amount": 3,
+            "target": "all_enemies"
+          },
+          {
+            "op": "apply_power",
+            "power": "vulnerable",
+            "amount": 3,
+            "target": "all_enemies"
+          },
+          {
+            "op": "exhaust_self"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Apply 5 Weak and Vulnerable to ALL enemies. Exhaust.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "weak",
+            "amount": 5,
+            "target": "all_enemies"
+          },
+          {
+            "op": "apply_power",
+            "power": "vulnerable",
+            "amount": 5,
+            "target": "all_enemies"
+          },
+          {
+            "op": "exhaust_self"
+          }
+        ]
+      }
+    },
+    {
+      "id": "spot_weakness",
+      "name": "Spot Weakness",
+      "color": "ironclad",
+      "rarity": "uncommon",
+      "type": "skill",
+      "target": "enemy",
+      "cost": {
+        "base": 1,
+        "upgraded": 1
+      },
+      "keywords": [],
+      "base": {
+        "text": "If the enemy intends to attack, gain 3 Strength.",
+        "effects": [
+          {
+            "op": "conditional",
+            "if_": {
+              "target_intent_has_attack": true
+            },
+            "then": [
+              {
+                "op": "apply_power",
+                "power": "strength",
+                "amount": 3,
+                "target": "player"
+              }
+            ]
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "If the enemy intends to attack, gain 4 Strength.",
+        "effects": [
+          {
+            "op": "conditional",
+            "if_": {
+              "target_intent_has_attack": true
+            },
+            "then": [
+              {
+                "op": "apply_power",
+                "power": "strength",
+                "amount": 4,
+                "target": "player"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "uppercut",
+      "name": "Uppercut",
+      "color": "ironclad",
+      "rarity": "uncommon",
+      "type": "attack",
+      "target": "enemy",
+      "cost": {
+        "base": 2,
+        "upgraded": 2
+      },
+      "keywords": [],
+      "base": {
+        "text": "Deal 13 damage. Apply 1 Weak. Apply 1 Vulnerable.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 13
+          },
+          {
+            "op": "apply_power",
+            "power": "weak",
+            "amount": 1
+          },
+          {
+            "op": "apply_power",
+            "power": "vulnerable",
+            "amount": 1
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Deal 13 damage. Apply 2 Weak. Apply 2 Vulnerable.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 13
+          },
+          {
+            "op": "apply_power",
+            "power": "weak",
+            "amount": 2
+          },
+          {
+            "op": "apply_power",
+            "power": "vulnerable",
+            "amount": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "whirlwind",
+      "name": "Whirlwind",
+      "color": "ironclad",
+      "rarity": "uncommon",
+      "type": "attack",
+      "target": "all_enemies",
+      "cost": {
+        "base": "X",
+        "upgraded": "X"
+      },
+      "keywords": [],
+      "base": {
+        "text": "Deal 5 damage to ALL enemies X times.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 5,
+            "hits": {
+              "dynamic": "energy_spent_x"
+            },
+            "target": "all_enemies"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Deal 8 damage to ALL enemies X times.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 8,
+            "hits": {
+              "dynamic": "energy_spent_x"
+            },
+            "target": "all_enemies"
+          }
+        ]
+      }
+    },
+    {
+      "id": "barricade",
+      "name": "Barricade",
+      "color": "ironclad",
+      "rarity": "rare",
+      "type": "power",
+      "target": "self",
+      "cost": {
+        "base": 3,
+        "upgraded": 2
+      },
+      "keywords": [],
+      "base": {
+        "text": "Block is not removed at the start of your turn.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "barricade",
+            "amount": 1,
+            "target": "player"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Block is not removed at the start of your turn.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "barricade",
+            "amount": 1,
+            "target": "player"
+          }
+        ]
+      }
+    },
+    {
+      "id": "berserk",
+      "name": "Berserk",
+      "color": "ironclad",
+      "rarity": "rare",
+      "type": "power",
+      "target": "self",
+      "cost": {
+        "base": 0,
+        "upgraded": 0
+      },
+      "keywords": [],
+      "base": {
+        "text": "Gain 2 Vulnerable. At the start of your turn, gain 1 Energy.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "vulnerable",
+            "amount": 2,
+            "target": "player"
+          },
+          {
+            "op": "apply_power",
+            "power": "berserk",
+            "amount": 1,
+            "target": "player"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Gain 1 Vulnerable. At the start of your turn, gain 1 Energy.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "vulnerable",
+            "amount": 1,
+            "target": "player"
+          },
+          {
+            "op": "apply_power",
+            "power": "berserk",
+            "amount": 1,
+            "target": "player"
+          }
+        ]
+      }
+    },
+    {
+      "id": "bludgeon",
+      "name": "Bludgeon",
+      "color": "ironclad",
+      "rarity": "rare",
+      "type": "attack",
+      "target": "enemy",
+      "cost": {
+        "base": 3,
+        "upgraded": 3
+      },
+      "keywords": [],
+      "base": {
+        "text": "Deal 32 damage.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 32
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Deal 42 damage.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 42
+          }
+        ]
+      }
+    },
+    {
+      "id": "brutality",
+      "name": "Brutality",
+      "color": "ironclad",
+      "rarity": "rare",
+      "type": "power",
+      "target": "self",
+      "cost": {
+        "base": 0,
+        "upgraded": 0
+      },
+      "keywords": [],
+      "base": {
+        "text": "At the start of your turn, lose 1 HP and draw 1 card.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "brutality",
+            "amount": 1,
+            "target": "player"
+          }
+        ],
+        "keywords": []
+      },
+      "upgraded": {
+        "text": "Innate. At the start of your turn, lose 1 HP and draw 1 card.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "brutality",
+            "amount": 1,
+            "target": "player"
+          }
+        ],
+        "keywords": [
+          "innate"
+        ]
+      },
+      "implementation_notes": [
+        "The upgraded card has the Innate keyword."
+      ]
+    },
+    {
+      "id": "corruption",
+      "name": "Corruption",
+      "color": "ironclad",
+      "rarity": "rare",
+      "type": "power",
+      "target": "self",
+      "cost": {
+        "base": 3,
+        "upgraded": 2
+      },
+      "keywords": [],
+      "base": {
+        "text": "Skills cost 0. Whenever you play a Skill, Exhaust it.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "corruption",
+            "amount": 1,
+            "target": "player"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Skills cost 0. Whenever you play a Skill, Exhaust it.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "corruption",
+            "amount": 1,
+            "target": "player"
+          }
+        ]
+      }
+    },
+    {
+      "id": "demon_form",
+      "name": "Demon Form",
+      "color": "ironclad",
+      "rarity": "rare",
+      "type": "power",
+      "target": "self",
+      "cost": {
+        "base": 3,
+        "upgraded": 3
+      },
+      "keywords": [],
+      "base": {
+        "text": "At the start of your turn, gain 2 Strength.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "demon_form",
+            "amount": 2,
+            "target": "player"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "At the start of your turn, gain 3 Strength.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "demon_form",
+            "amount": 3,
+            "target": "player"
+          }
+        ]
+      }
+    },
+    {
+      "id": "double_tap",
+      "name": "Double Tap",
+      "color": "ironclad",
+      "rarity": "rare",
+      "type": "skill",
+      "target": "self",
+      "cost": {
+        "base": 1,
+        "upgraded": 1
+      },
+      "keywords": [],
+      "base": {
+        "text": "This turn, your next Attack is played twice.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "double_tap",
+            "amount": 1,
+            "target": "player",
+            "duration": "turn"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "This turn, your next 2 Attacks are played twice.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "double_tap",
+            "amount": 2,
+            "target": "player",
+            "duration": "turn"
+          }
+        ]
+      }
+    },
+    {
+      "id": "exhume",
+      "name": "Exhume",
+      "color": "ironclad",
+      "rarity": "rare",
+      "type": "skill",
+      "target": "self",
+      "cost": {
+        "base": 1,
+        "upgraded": 0
+      },
+      "keywords": [
+        "exhaust"
+      ],
+      "base": {
+        "text": "Put a card from your Exhaust pile into your hand. Exhaust.",
+        "effects": [
+          {
+            "op": "move_card",
+            "source": "exhaust_pile",
+            "destination": "hand",
+            "selection": "choose_one",
+            "filter": {
+              "id_not": "exhume"
+            }
+          },
+          {
+            "op": "exhaust_self"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Put a card from your Exhaust pile into your hand. Exhaust.",
+        "effects": [
+          {
+            "op": "move_card",
+            "source": "exhaust_pile",
+            "destination": "hand",
+            "selection": "choose_one",
+            "filter": {
+              "id_not": "exhume"
+            }
+          },
+          {
+            "op": "exhaust_self"
+          }
+        ]
+      },
+      "implementation_notes": [
+        "Exhume cannot retrieve any Exhume card."
+      ]
+    },
+    {
+      "id": "feed",
+      "name": "Feed",
+      "color": "ironclad",
+      "rarity": "rare",
+      "type": "attack",
+      "target": "enemy",
+      "cost": {
+        "base": 1,
+        "upgraded": 1
+      },
+      "keywords": [
+        "fatal",
+        "exhaust"
+      ],
+      "base": {
+        "text": "Deal 10 damage. Fatal: Raise your Max HP by 3. Exhaust.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 10
+          },
+          {
+            "op": "fatal",
+            "then": [
+              {
+                "op": "gain_max_hp",
+                "amount": 3
+              }
+            ],
+            "valid_target": {
+              "not_minion": true
+            }
+          },
+          {
+            "op": "exhaust_self"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Deal 12 damage. Fatal: Raise your Max HP by 4. Exhaust.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 12
+          },
+          {
+            "op": "fatal",
+            "then": [
+              {
+                "op": "gain_max_hp",
+                "amount": 4
+              }
+            ],
+            "valid_target": {
+              "not_minion": true
+            }
+          },
+          {
+            "op": "exhaust_self"
+          }
+        ]
+      }
+    },
+    {
+      "id": "fiend_fire",
+      "name": "Fiend Fire",
+      "color": "ironclad",
+      "rarity": "rare",
+      "type": "attack",
+      "target": "enemy",
+      "cost": {
+        "base": 2,
+        "upgraded": 2
+      },
+      "keywords": [
+        "exhaust"
+      ],
+      "base": {
+        "text": "Exhaust your hand. Deal 7 damage for each Exhausted card.",
+        "effects": [
+          {
+            "op": "exhaust_cards",
+            "zone": "hand",
+            "filter": {
+              "all": true
+            }
+          },
+          {
+            "op": "damage",
+            "amount": 7,
+            "hits": {
+              "result_of_previous_effect": "cards_exhausted"
+            }
+          },
+          {
+            "op": "exhaust_self"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Exhaust your hand. Deal 10 damage for each Exhausted card.",
+        "effects": [
+          {
+            "op": "exhaust_cards",
+            "zone": "hand",
+            "filter": {
+              "all": true
+            }
+          },
+          {
+            "op": "damage",
+            "amount": 10,
+            "hits": {
+              "result_of_previous_effect": "cards_exhausted"
+            }
+          },
+          {
+            "op": "exhaust_self"
+          }
+        ]
+      }
+    },
+    {
+      "id": "immolate",
+      "name": "Immolate",
+      "color": "ironclad",
+      "rarity": "rare",
+      "type": "attack",
+      "target": "all_enemies",
+      "cost": {
+        "base": 2,
+        "upgraded": 2
+      },
+      "keywords": [],
+      "base": {
+        "text": "Deal 21 damage to ALL enemies. Add a Burn into your discard pile.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 21,
+            "target": "all_enemies"
+          },
+          {
+            "op": "create_card",
+            "card": "burn",
+            "destination": "discard_pile"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Deal 28 damage to ALL enemies. Add a Burn into your discard pile.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 28,
+            "target": "all_enemies"
+          },
+          {
+            "op": "create_card",
+            "card": "burn",
+            "destination": "discard_pile"
+          }
+        ]
+      }
+    },
+    {
+      "id": "impervious",
+      "name": "Impervious",
+      "color": "ironclad",
+      "rarity": "rare",
+      "type": "skill",
+      "target": "self",
+      "cost": {
+        "base": 2,
+        "upgraded": 2
+      },
+      "keywords": [
+        "exhaust"
+      ],
+      "base": {
+        "text": "Gain 30 Block. Exhaust.",
+        "effects": [
+          {
+            "op": "gain_block",
+            "amount": 30
+          },
+          {
+            "op": "exhaust_self"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Gain 40 Block. Exhaust.",
+        "effects": [
+          {
+            "op": "gain_block",
+            "amount": 40
+          },
+          {
+            "op": "exhaust_self"
+          }
+        ]
+      }
+    },
+    {
+      "id": "juggernaut",
+      "name": "Juggernaut",
+      "color": "ironclad",
+      "rarity": "rare",
+      "type": "power",
+      "target": "self",
+      "cost": {
+        "base": 2,
+        "upgraded": 2
+      },
+      "keywords": [],
+      "base": {
+        "text": "Whenever you gain Block, deal 5 damage to a random enemy.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "juggernaut",
+            "amount": 5,
+            "target": "player"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Whenever you gain Block, deal 7 damage to a random enemy.",
+        "effects": [
+          {
+            "op": "apply_power",
+            "power": "juggernaut",
+            "amount": 7,
+            "target": "player"
+          }
+        ]
+      }
+    },
+    {
+      "id": "limit_break",
+      "name": "Limit Break",
+      "color": "ironclad",
+      "rarity": "rare",
+      "type": "skill",
+      "target": "self",
+      "cost": {
+        "base": 1,
+        "upgraded": 1
+      },
+      "keywords": [
+        "exhaust"
+      ],
+      "base": {
+        "text": "Double your Strength. Exhaust.",
+        "effects": [
+          {
+            "op": "multiply_power",
+            "power": "strength",
+            "factor": 2,
+            "target": "player"
+          },
+          {
+            "op": "exhaust_self"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Double your Strength.",
+        "effects": [
+          {
+            "op": "multiply_power",
+            "power": "strength",
+            "factor": 2,
+            "target": "player"
+          }
+        ]
+      },
+      "implementation_notes": [
+        "Negative Strength is doubled as well."
+      ]
+    },
+    {
+      "id": "offering",
+      "name": "Offering",
+      "color": "ironclad",
+      "rarity": "rare",
+      "type": "skill",
+      "target": "self",
+      "cost": {
+        "base": 0,
+        "upgraded": 0
+      },
+      "keywords": [
+        "exhaust"
+      ],
+      "base": {
+        "text": "Lose 6 HP. Gain 2 Energy. Draw 3 cards. Exhaust.",
+        "effects": [
+          {
+            "op": "lose_hp",
+            "amount": 6,
+            "source": "card"
+          },
+          {
+            "op": "gain_energy",
+            "amount": 2
+          },
+          {
+            "op": "draw",
+            "amount": 3
+          },
+          {
+            "op": "exhaust_self"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Lose 6 HP. Gain 2 Energy. Draw 5 cards. Exhaust.",
+        "effects": [
+          {
+            "op": "lose_hp",
+            "amount": 6,
+            "source": "card"
+          },
+          {
+            "op": "gain_energy",
+            "amount": 2
+          },
+          {
+            "op": "draw",
+            "amount": 5
+          },
+          {
+            "op": "exhaust_self"
+          }
+        ]
+      }
+    },
+    {
+      "id": "reaper",
+      "name": "Reaper",
+      "color": "ironclad",
+      "rarity": "rare",
+      "type": "attack",
+      "target": "all_enemies",
+      "cost": {
+        "base": 2,
+        "upgraded": 2
+      },
+      "keywords": [
+        "exhaust"
+      ],
+      "base": {
+        "text": "Deal 4 damage to ALL enemies. Heal HP equal to unblocked damage. Exhaust.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 4,
+            "target": "all_enemies",
+            "capture": "actual_hp_loss_total"
+          },
+          {
+            "op": "heal",
+            "amount": {
+              "captured": "actual_hp_loss_total"
+            }
+          },
+          {
+            "op": "exhaust_self"
+          }
+        ]
+      },
+      "upgraded": {
+        "text": "Deal 5 damage to ALL enemies. Heal HP equal to unblocked damage. Exhaust.",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 5,
+            "target": "all_enemies",
+            "capture": "actual_hp_loss_total"
+          },
+          {
+            "op": "heal",
+            "amount": {
+              "captured": "actual_hp_loss_total"
+            }
+          },
+          {
+            "op": "exhaust_self"
+          }
+        ]
+      }
+    }
+  ]
+}

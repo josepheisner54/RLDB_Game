@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0.0",
+  "id": "ironclad",
+  "name": "Ironclad",
+  "max_hp": 80,
+  "starting_hp": 80,
+  "base_energy_per_turn": 3,
+  "base_draw_per_turn": 5,
+  "hand_size_limit": 10,
+  "starting_deck": [
+    {
+      "card": "strike",
+      "count": 5
+    },
+    {
+      "card": "defend",
+      "count": 4
+    },
+    {
+      "card": "bash",
+      "count": 1
+    }
+  ],
+  "starting_relic": {
+    "id": "burning_blood",
+    "name": "Burning Blood",
+    "trigger": "on_combat_victory",
+    "effects": [
+      {
+        "op": "heal",
+        "amount": 6
+      }
+    ]
+  }
+}
