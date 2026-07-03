@@ -545,6 +545,7 @@ def resolve_enemy_move(C, st, e, active):
                                          st["ehp"][rr, s_])
                         st["ehp"][rr, s_] = hp
                         st["emax"][rr, s_] = torch.maximum(hp, st["emax"][rr, s_] * 0 + hp)
+                        st["hp_budget"][rr] += hp
                 n_spawn = n_spawn - need.long()
         m = act & (opk == o["change_state"])   # handled by AI registers
         _ = m
@@ -647,6 +648,7 @@ def legal_actions(C, st):
 def player_turn(C, st, policy=None, collect_logp=False):
     B = st["B"]
     logp = torch.zeros(B, device=DEVICE)
+    entropy = torch.zeros(B, device=DEVICE)
     done = ~(player_alive(st) & alive_mask(st).any(-1))
     for _ in range(PLAY_CAP):
         if done.all():
@@ -664,6 +666,7 @@ def player_turn(C, st, policy=None, collect_logp=False):
         a = dist.sample()
         if collect_logp:
             logp = logp + dist.log_prob(a) * (~done).float()
+            entropy = entropy + dist.entropy() * (~done).float()
         end = (a == C.N * E_MAX) | done
         done = done | end
         playing = ~end
@@ -708,7 +711,7 @@ def player_turn(C, st, policy=None, collect_logp=False):
         st["disc"] += one * (playing & ~to_exh & ~is_pow).float().unsqueeze(-1)
         _on_exhaust(C, st, to_exh, 1.0)
         done = done | ~(player_alive(st) & alive_mask(st).any(-1))
-    return logp
+    return logp, entropy
 
 
 # ------------------------------------------------------------ full combat
@@ -722,6 +725,7 @@ def combat(C, deck_counts, php, enc_ids, policy=None, collect_logp=False):
             g = st["etype"] == ti
             st["regs"][..., 4][g] = spec.shift0
     logp = torch.zeros(B, device=DEVICE)
+    entropy = torch.zeros(B, device=DEVICE)
     start_hp = php.clone()
     won = torch.zeros(B, device=DEVICE)
     for t in range(TURN_CAP):
@@ -733,7 +737,9 @@ def combat(C, deck_counts, php, enc_ids, policy=None, collect_logp=False):
                                          st["ehp"], st["emax"], st["eblk"],
                                          st["regs"], t)
         start_player_turn(C, st, first_turn=(t == 0))
-        logp = logp + player_turn(C, st, policy, collect_logp)
+        lp, en = player_turn(C, st, policy, collect_logp)
+        logp = logp + lp
+        entropy = entropy + en
         end_player_turn(C, st)
         for e in range(E_MAX):
             resolve_enemy_move(C, st, e, ongoing)
@@ -748,5 +754,7 @@ def combat(C, deck_counts, php, enc_ids, policy=None, collect_logp=False):
                       - won * 0, max=1.0)
     won = ((~alive_mask(st).any(-1)) & player_alive(st)).float()
     end_hp = st["php"].clamp(min=0) * won
+    remaining = (st["ehp"].clamp(min=0) * (st["etype"] >= 0).float()).sum(-1)
+    frac = (1.0 - remaining / st["hp_budget"].clamp(min=1.0)).clamp(0.0, 1.0)
     return dict(won=won, end_hp=end_hp, delta_hp=end_hp - start_hp, logp=logp,
-                gold_lost=st["gold_lost"], st=st)
+                entropy=entropy, frac=frac, gold_lost=st["gold_lost"], st=st)

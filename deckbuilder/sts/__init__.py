@@ -14,4 +14,4 @@ from .runsim import simulate_runs, DEFAULT_FLOORS
 from .agents import CombatPolicy, RandomPolicy, ValueNet, MetaAgent, \
     encounter_features
 from .training import train_combat, refine_value, train_meta, eval_combat, \
-    sample_decks, sample_conditions
+    sample_decks, sample_conditions, finetune_on_runs

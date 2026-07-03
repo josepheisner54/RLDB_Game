@@ -137,12 +137,16 @@ class ValueNet(nn.Module):
         super().__init__()
         self.enc = DeckEncoder(C)
         self.net = nn.Sequential(nn.Linear(1 + 6 + 48, d), nn.ReLU(),
-                                 nn.Linear(d, d), nn.ReLU(), nn.Linear(d, 2))
+                                 nn.Linear(d, d), nn.ReLU(), nn.Linear(d, 3))
 
     def forward(self, hp, enc_feats, deck):
+        """-> (E[dHP], P(death), E[frac of enemy HP dealt]).
+        The frac head is dense credit precisely where the win signal
+        saturates (bosses): it still depends on entering HP, so campfire
+        decisions keep a gradient even in mostly-lethal fights."""
         x = torch.cat([hp.unsqueeze(-1) / 80, enc_feats, self.enc(deck)], -1)
         o = self.net(x)
-        return o[:, 0] * 80, torch.sigmoid(o[:, 1])
+        return o[:, 0] * 80, torch.sigmoid(o[:, 1]), torch.sigmoid(o[:, 2])
 
 
 class MetaAgent(nn.Module):

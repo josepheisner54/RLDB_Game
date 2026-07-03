@@ -17,8 +17,10 @@ from .rewards import roll_offers, apply_pick, init_pity, N_OFFERS
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
+# Canon-paced Act 1 gauntlet: 8 fights, 3 campfires, 1 elite, boss.
 DEFAULT_FLOORS = ["combat", "combat", "combat", "combat", "campfire",
-                  "elite", "combat", "campfire", "boss"]
+                  "combat", "elite", "campfire", "combat", "combat",
+                  "campfire", "boss"]
 REST_HEAL_FRAC = 0.30
 
 
@@ -94,7 +96,8 @@ def simulate_runs(C, policy, drafter, B=512, floors=None, seed=0, record=False):
     last1, last2 = [""] * B, [""] * B
     n_combats = 0
     rec = dict(draft=torch.zeros(C.N + 1), upgrade=torch.zeros(C.M + 1),
-               camp_hp=[], camp_rest=[], floor_alive=[]) if record else None
+               camp_hp=[], camp_rest=[], floor_alive=[],
+               snapshots=[]) if record else None
     for floor in floors:
         if floor == "campfire":
             deck, hp = _campfire(C, drafter, deck, hp, alive, rec)
@@ -114,6 +117,11 @@ def simulate_runs(C, policy, drafter, B=512, floors=None, seed=0, record=False):
             source = "boss"
         else:
             raise ValueError(floor)
+        if record:
+            rec["snapshots"].append(dict(deck=deck.clone(),
+                                         hp=hp.clamp(min=1.0).clone(),
+                                         enc=list(enc), source=floor,
+                                         alive=alive.clone()))
         out = combat(C, deck, hp.clamp(min=1.0), enc, policy=policy)
         alive = alive * out["won"]
         hp = out["end_hp"] * alive

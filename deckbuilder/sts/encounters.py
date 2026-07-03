@@ -20,6 +20,7 @@ def blank_slots(B):
         regs=torch.zeros(B, E_MAX, NREG, device=DEVICE),
         stolen=torch.zeros(B, E_MAX, device=DEVICE),
         spawn_amt=torch.zeros(B, E_MAX, device=DEVICE),
+        hp_budget=torch.zeros(B, device=DEVICE),
     )
 
 
@@ -64,12 +65,14 @@ def spawn_encounter(C, enc_ids, B):
                 if "ai_parameters" in spec:
                     fm = C.move_id[(spec["enemy"], spec["ai_parameters"]["first_move"])]
                 init_slot(C, slots, rows, si, et, first_move=fm)
+                slots["hp_budget"][rows] += slots["ehp"][rows, si]
         elif kind == "generated":
             for si, spec in enumerate(e["slots"]):
                 opts = torch.tensor([C.eid[n] for n in spec["choose_uniform"]],
                                     device=DEVICE)
                 et = opts[torch.randint(0, len(opts), (len(rows),), device=DEVICE)]
                 init_slot(C, slots, rows, si, et)
+                slots["hp_budget"][rows] += slots["ehp"][rows, si]
         elif kind == "choose_uniform_formation":
             forms = e["formations"]
             pick = torch.randint(0, len(forms), (len(rows),), device=DEVICE)
@@ -81,12 +84,14 @@ def spawn_encounter(C, enc_ids, B):
                     et = torch.full((len(sub),), C.eid[spec["enemy"]],
                                     dtype=torch.long, device=DEVICE)
                     init_slot(C, slots, sub, si, et)
+                    slots["hp_budget"][sub] += slots["ehp"][sub, si]
         elif kind == "sample_without_replacement":
             bag = torch.tensor([C.eid[n] for n in e["bag"]], device=DEVICE)
             g = torch.rand(len(rows), len(bag), device=DEVICE)
             order = g.argsort(dim=1)[:, :e["count"]]
             for si in range(e["count"]):
                 init_slot(C, slots, rows, si, bag[order[:, si]])
+                slots["hp_budget"][rows] += slots["ehp"][rows, si]
         else:
             raise ValueError(f"unknown encounter kind {kind}")
     return slots
