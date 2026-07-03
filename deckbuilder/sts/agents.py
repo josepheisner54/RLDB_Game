@@ -62,13 +62,20 @@ def target_features(C, st):
 
 
 class CombatPolicy(nn.Module):
-    def __init__(self, C, h=64):
+    def __init__(self, C, h=64, n_layers=1):
+        """h: trunk/head width. n_layers: hidden Linear(h,h) layers in the
+        shared head -- where state x card x target interaction modeling
+        lives. Defaults (h=64, n_layers=1) reproduce the original network,
+        so existing checkpoints load unchanged."""
         super().__init__()
         self.fs = nn.Linear(DS, h)
         self.fc = nn.Linear(C.FEAT_DIM, h)
         self.ft = nn.Linear(DT, h)
-        self.head = nn.Sequential(nn.ReLU(), nn.Linear(h, h), nn.ReLU(),
-                                  nn.Linear(h, 1))
+        layers = [nn.ReLU()]
+        for _ in range(n_layers):
+            layers += [nn.Linear(h, h), nn.ReLU()]
+        layers += [nn.Linear(h, 1)]
+        self.head = nn.Sequential(*layers)
         self.end = nn.Sequential(nn.Linear(DS, h), nn.ReLU(), nn.Linear(h, 1))
 
     def forward(self, C, st, mask):

@@ -64,6 +64,29 @@ def sample_decks(C, B, max_drafts=8, upgrade_p=0.4, wound_p=0.15):
     return deck
 
 
+def eval_by_pool(C, policy, B=384, seed=321, hp=65.0, drafts=6, verbose=True):
+    """Per-tier instrument panel: the boss column is the number that matters.
+    Fixed entering HP + fixed draft budget so configs compare cleanly."""
+    rows = {}
+    for pool in ("easy_hallway", "hard_hallway", "elite", "boss"):
+        with torch.random.fork_rng(devices=[]):
+            torch.manual_seed(seed)
+            ids = [p["encounter"] for p in C.POOLS[pool]]
+            enc = [ids[i % len(ids)] for i in range(B)]
+            deck = sample_decks(C, B, max_drafts=drafts)
+            with torch.no_grad():
+                out = combat(C, deck, torch.full((B,), hp, device=DEVICE), enc,
+                             policy=policy)
+        rows[pool] = dict(win=out["won"].mean().item(),
+                          dhp=out["delta_hp"].mean().item(),
+                          frac=out["frac"].mean().item())
+        if verbose:
+            r = rows[pool]
+            print(f"  {pool:>13}: win {r['win']:.3f}  dHP {r['dhp']:+6.1f}  "
+                  f"frac {r['frac']:.3f}")
+    return rows
+
+
 def eval_combat(C, policy, B=512, seed=123):
     with torch.random.fork_rng(devices=[]):
         torch.manual_seed(seed)
@@ -89,30 +112,48 @@ def make_optim(params, lr, total_steps, warmup_frac=0.05, weight_decay=1e-2):
 
 
 def _rl_step(C, policy, V, opt, sched, optv, deck, enc, hp, ef, eidx,
-             ent_coef=ENT_COEF):
-    out = combat(C, deck, hp, enc, policy=policy, collect_logp=True)
-    died = 1 - out["won"]
-    R = (out["delta_hp"] - DEATH_PEN * died + SHAPE_FRAC * out["frac"]) / 80.0
-    encf = ef[torch.tensor([eidx[e] for e in enc], device=DEVICE)]
-    with torch.no_grad():
-        vd, vp, vf = V(hp, encf, deck)
-        baseline = (vd - DEATH_PEN * vp + SHAPE_FRAC * vf) / 80.0
-    adv = (R - baseline).detach()
-    adv = (adv - adv.mean()) / adv.std().clamp(min=1e-6)
-    loss = -(adv * out["logp"]).mean() - ent_coef * out["entropy"].mean()
-    opt.zero_grad(); loss.backward()
+             ent_coef=ENT_COEF, micro_B=64):
+    """One optimizer step at effective batch B via gradient accumulation.
+    Episodes are independent, so chunked backward is exact for the policy
+    gradient (advantage normalization is per-chunk; chunks of 64 keep the
+    statistics stable). Peak activation memory scales with micro_B, not B --
+    this is what lets h=256 train at the same effective batch as h=64."""
+    B = deck.shape[0]
+    encf_all = ef[torch.tensor([eidx[e] for e in enc], device=DEVICE)]
+    opt.zero_grad()
+    stats = dict(won=[], delta_hp=[], frac=[], died=[])
+    for i in range(0, B, micro_B):
+        sl = slice(i, min(i + micro_B, B))
+        out = combat(C, deck[sl], hp[sl], [enc[j] for j in range(sl.start, sl.stop)],
+                     policy=policy, collect_logp=True)
+        died = 1 - out["won"]
+        R = (out["delta_hp"] - DEATH_PEN * died + SHAPE_FRAC * out["frac"]) / 80.0
+        with torch.no_grad():
+            vd, vp, vf = V(hp[sl], encf_all[sl], deck[sl])
+            baseline = (vd - DEATH_PEN * vp + SHAPE_FRAC * vf) / 80.0
+        adv = (R - baseline).detach()
+        adv = (adv - adv.mean()) / adv.std().clamp(min=1e-6)
+        w = (sl.stop - sl.start) / B
+        loss = (-(adv * out["logp"]).mean() - ent_coef * out["entropy"].mean()) * w
+        loss.backward()                      # frees this chunk's graph now
+        stats["won"].append(out["won"].detach())
+        stats["delta_hp"].append(out["delta_hp"].detach())
+        stats["frac"].append(out["frac"].detach())
+        stats["died"].append(died.detach())
     torch.nn.utils.clip_grad_norm_(policy.parameters(), 5.0)
     opt.step(); sched.step()
-    vd, vp, vf = V(hp, encf, deck)
-    vloss = F.mse_loss(vd / 80, out["delta_hp"] / 80) \
+    won = torch.cat(stats["won"]); dhp = torch.cat(stats["delta_hp"])
+    frac = torch.cat(stats["frac"]); died = torch.cat(stats["died"])
+    vd, vp, vf = V(hp, encf_all, deck)
+    vloss = F.mse_loss(vd / 80, dhp / 80) \
         + F.binary_cross_entropy(vp, died) \
-        + F.mse_loss(vf, out["frac"])
+        + F.mse_loss(vf, frac)
     optv.zero_grad(); vloss.backward(); optv.step()
-    return out
+    return dict(won=won, delta_hp=dhp, frac=frac)
 
 
 def train_combat(C, steps=600, B=128, eval_every=50, lr_pi=1e-3, lr_v=1e-3,
-                 policy=None, V=None, verbose=True):
+                 policy=None, V=None, micro_B=64, verbose=True):
     policy = policy or CombatPolicy(C).to(DEVICE)
     V = V or ValueNet(C).to(DEVICE)
     ef, eidx = encounter_features(C)
@@ -123,7 +164,8 @@ def train_combat(C, steps=600, B=128, eval_every=50, lr_pi=1e-3, lr_v=1e-3,
         deck = sample_decks(C, B)
         enc = sample_conditions(C, B)
         hp = torch.rand(B, device=DEVICE) * 65 + 12
-        out = _rl_step(C, policy, V, opt, sched, optv, deck, enc, hp, ef, eidx)
+        out = _rl_step(C, policy, V, opt, sched, optv, deck, enc, hp, ef, eidx,
+                       micro_B=micro_B)
         if s % eval_every == 0 or s == steps - 1:
             ev = eval_combat(C, policy)
             hist.append((s, out["won"].mean().item(), ev["win"], ev["dhp"]))
@@ -157,7 +199,7 @@ def refine_value(C, policy, V, steps=200, B=256, lr=5e-4, verbose=True):
 
 def finetune_on_runs(C, policy, V, meta, steps=300, B=128, harvest_runs=3,
                      harvest_B=512, mix=0.5, lr_pi=3e-4, eval_every=50,
-                     verbose=True):
+                     micro_B=64, verbose=True):
     """Stage 2: fine-tune the combat agent on the decks the meta agent
     ACTUALLY builds (harvested from full runs), mixed 50/50 with broad
     samples to protect coverage."""
@@ -188,7 +230,8 @@ def finetune_on_runs(C, policy, V, meta, steps=300, B=128, harvest_runs=3,
             deck = sample_decks(C, B)
             enc = sample_conditions(C, B)
             hp = torch.rand(B, device=DEVICE) * 65 + 12
-        out = _rl_step(C, policy, V, opt, sched, optv, deck, enc, hp, ef, eidx)
+        out = _rl_step(C, policy, V, opt, sched, optv, deck, enc, hp, ef, eidx,
+                       micro_B=micro_B)
         if s % eval_every == 0 or s == steps - 1:
             ev = eval_combat(C, policy)
             hist.append((s, ev["win"], ev["dhp"]))
