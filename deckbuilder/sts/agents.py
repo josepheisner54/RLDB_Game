@@ -77,15 +77,40 @@ class CombatPolicy(nn.Module):
         layers += [nn.Linear(h, 1)]
         self.head = nn.Sequential(*layers)
         self.end = nn.Sequential(nn.Linear(DS, h), nn.ReLU(), nn.Linear(h, 1))
+        self.ckpt = True          # gradient-checkpoint the head (exact; ~30% fwd recompute)
+        self._ccache = None       # (fc weight version, embedding) for no-grad passes
 
-    def forward(self, C, st, mask):
-        B = st["B"]
-        s = self.fs(state_features(C, st))                    # (B,h)
-        c = self.fc(C.CARD_FEATS)                             # (N,h)
-        t = self.ft(target_features(C, st))                   # (B,E,h)
+    def _card_emb(self, C):
+        """fc(CARD_FEATS) is static within an optimizer step. For no-grad
+        passes, cache it keyed on the weight tensor's in-place version
+        counter (optimizer steps bump it), so the cache can never go stale."""
+        if torch.is_grad_enabled():
+            return self.fc(C.CARD_FEATS)
+        v = self.fc.weight._version
+        if self._ccache is None or self._ccache[0] != v:
+            with torch.no_grad():
+                self._ccache = (v, self.fc(C.CARD_FEATS))
+        return self._ccache[1]
+
+    def _score(self, C, sfeat, tfeat):
+        """Pure function of feature SNAPSHOTS -- safe to recompute at backward
+        time even though the live combat state has mutated since the play."""
+        B = sfeat.shape[0]
+        s = self.fs(sfeat)
+        c = self._card_emb(C)
+        t = self.ft(tfeat)
         x = (s.view(B, 1, 1, -1) + c.view(1, C.N, 1, -1) + t.view(B, 1, E_MAX, -1))
         scores = self.head(x).squeeze(-1).reshape(B, C.N * E_MAX)
-        return torch.cat([scores, self.end(state_features(C, st))], -1)
+        return torch.cat([scores, self.end(sfeat)], -1)
+
+    def forward(self, C, st, mask):
+        sfeat = state_features(C, st)
+        tfeat = target_features(C, st)
+        if self.ckpt and torch.is_grad_enabled():
+            from torch.utils.checkpoint import checkpoint
+            return checkpoint(lambda a, b: self._score(C, a, b), sfeat, tfeat,
+                              use_reentrant=False)
+        return self._score(C, sfeat, tfeat)
 
 
 class RandomPolicy(nn.Module):

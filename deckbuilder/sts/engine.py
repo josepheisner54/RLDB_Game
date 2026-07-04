@@ -284,15 +284,18 @@ def resolve_player_card(C, st, row, chosen, active, nested=False):
         if m.any():
             draw_cards(C, st, (amt * m.float()).long(), m)
         m = act & (opk == o["gain_energy"])
-        st["energy"] += amt * m.float()
+        if m.any():
+            st["energy"] += amt * m.float()
         m = act & (opk == o["lose_hp"])
         if m.any():
             _lose_hp(C, st, amt * m.float(), m)
         m = act & (opk == o["heal"])
-        st["php"] = torch.minimum(st["php"] + amt * m.float(),
-                                  torch.full_like(st["php"], C.HP_MAX))
+        if m.any():
+            st["php"] = torch.minimum(st["php"] + amt * m.float(),
+                                      torch.full_like(st["php"], C.HP_MAX))
         m = act & (opk == o["gain_max_hp"])
-        st["php"] += amt * m.float()                    # run-level max hp handled upstream
+        if m.any():
+            st["php"] += amt * m.float()                # run-level max hp handled upstream
         m = act & (opk == o["create_card"])
         if m.any():
             crow = prog[:, k, 3].long()
@@ -396,9 +399,11 @@ def resolve_player_card(C, st, row, chosen, active, nested=False):
             st["hand"][:, :C.M] -= up
             st["hand"][:, C.M:2 * C.M] += up
         m = act & (opk == o["rampage_grow"])
-        st["rampage"] += amt * m.float()
+        if m.any():
+            st["rampage"] += amt * m.float()
         m = act & (opk == o["multiply_block"])
-        st["pblock"] *= torch.where(m, amt.clamp(min=2.0), torch.ones_like(amt))
+        if m.any():
+            st["pblock"] *= torch.where(m, amt.clamp(min=2.0), torch.ones_like(amt))
         m = act & (opk == o["multiply_power"])
         if m.any():
             pid = prog[:, k, 3].long()
@@ -411,7 +416,8 @@ def resolve_player_card(C, st, row, chosen, active, nested=False):
             idx = atk_rows[torch.randint(0, len(atk_rows), (B,), device=DEVICE)]
             st["hand"] += F.one_hot(idx, C.N).float() * m.float().unsqueeze(-1)
         m = act & (opk == o["set_flag"])
-        st["inferno"] = torch.where(m, torch.ones_like(st["inferno"]), st["inferno"])
+        if m.any():
+            st["inferno"] = torch.where(m, torch.ones_like(st["inferno"]), st["inferno"])
         fatal_credit |= (pre_alive & ~alive_mask(st)).any(-1) & act
     return exhaust_flag
 
@@ -506,12 +512,15 @@ def resolve_enemy_move(C, st, e, active):
             st["draw"] += onehot * (dest == DEST_DRAW).float().unsqueeze(-1)
             st["disc"] += onehot * (dest != DEST_DRAW).float().unsqueeze(-1)
         m = act & (opk == o["heal"])
-        st["ehp"][:, e] = torch.minimum(st["ehp"][:, e] + amt * m.float(),
-                                        st["emax"][:, e])
+        if m.any():
+            st["ehp"][:, e] = torch.minimum(st["ehp"][:, e] + amt * m.float(),
+                                            st["emax"][:, e])
         m = act & (opk == o["steal_gold"])
-        st["stolen"][:, e] += amt * m.float()
+        if m.any():
+            st["stolen"][:, e] += amt * m.float()
         m = act & (opk == o["capture"])
-        st["captured"] = torch.where(m, st["ehp"][:, e], st["captured"])
+        if m.any():
+            st["captured"] = torch.where(m, st["ehp"][:, e], st["captured"])
         m = act & (opk == o["die_no_rewards"])
         if m.any():
             st["etype"][:, e][m] = -1

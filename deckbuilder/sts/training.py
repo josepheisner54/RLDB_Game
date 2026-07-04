@@ -112,7 +112,7 @@ def make_optim(params, lr, total_steps, warmup_frac=0.05, weight_decay=1e-2):
 
 
 def _rl_step(C, policy, V, opt, sched, optv, deck, enc, hp, ef, eidx,
-             ent_coef=ENT_COEF, micro_B=64):
+             ent_coef=ENT_COEF, micro_B=64, scaler=None):
     """One optimizer step at effective batch B via gradient accumulation.
     Episodes are independent, so chunked backward is exact for the policy
     gradient (advantage normalization is per-chunk; chunks of 64 keep the
@@ -122,10 +122,13 @@ def _rl_step(C, policy, V, opt, sched, optv, deck, enc, hp, ef, eidx,
     encf_all = ef[torch.tensor([eidx[e] for e in enc], device=DEVICE)]
     opt.zero_grad()
     stats = dict(won=[], delta_hp=[], frac=[], died=[])
+    use_amp = scaler is not None and scaler.is_enabled()
     for i in range(0, B, micro_B):
         sl = slice(i, min(i + micro_B, B))
-        out = combat(C, deck[sl], hp[sl], [enc[j] for j in range(sl.start, sl.stop)],
-                     policy=policy, collect_logp=True)
+        with torch.autocast("cuda", dtype=torch.float16, enabled=use_amp):
+            out = combat(C, deck[sl], hp[sl],
+                         [enc[j] for j in range(sl.start, sl.stop)],
+                         policy=policy, collect_logp=True)
         died = 1 - out["won"]
         R = (out["delta_hp"] - DEATH_PEN * died + SHAPE_FRAC * out["frac"]) / 80.0
         with torch.no_grad():
@@ -134,14 +137,21 @@ def _rl_step(C, policy, V, opt, sched, optv, deck, enc, hp, ef, eidx,
         adv = (R - baseline).detach()
         adv = (adv - adv.mean()) / adv.std().clamp(min=1e-6)
         w = (sl.stop - sl.start) / B
-        loss = (-(adv * out["logp"]).mean() - ent_coef * out["entropy"].mean()) * w
-        loss.backward()                      # frees this chunk's graph now
+        loss = (-(adv * out["logp"].float()).mean()
+                - ent_coef * out["entropy"].float().mean()) * w
+        (scaler.scale(loss) if use_amp else loss).backward()   # frees this chunk's graph
         stats["won"].append(out["won"].detach())
         stats["delta_hp"].append(out["delta_hp"].detach())
         stats["frac"].append(out["frac"].detach())
         stats["died"].append(died.detach())
+    if use_amp:
+        scaler.unscale_(opt)
     torch.nn.utils.clip_grad_norm_(policy.parameters(), 5.0)
-    opt.step(); sched.step()
+    if use_amp:
+        scaler.step(opt); scaler.update()
+    else:
+        opt.step()
+    sched.step()
     won = torch.cat(stats["won"]); dhp = torch.cat(stats["delta_hp"])
     frac = torch.cat(stats["frac"]); died = torch.cat(stats["died"])
     vd, vp, vf = V(hp, encf_all, deck)
@@ -153,19 +163,22 @@ def _rl_step(C, policy, V, opt, sched, optv, deck, enc, hp, ef, eidx,
 
 
 def train_combat(C, steps=600, B=128, eval_every=50, lr_pi=1e-3, lr_v=1e-3,
-                 policy=None, V=None, micro_B=64, verbose=True):
+                 policy=None, V=None, micro_B=64, amp=False, verbose=True):
+    """amp=True enables fp16 autocast around the policy (experimental; T4
+    speedup, slight logit-precision tradeoff for REINFORCE)."""
     policy = policy or CombatPolicy(C).to(DEVICE)
     V = V or ValueNet(C).to(DEVICE)
     ef, eidx = encounter_features(C)
     opt, sched = make_optim(policy.parameters(), lr_pi, steps)
     optv = torch.optim.Adam(V.parameters(), lr=lr_v)
+    scaler = torch.amp.GradScaler("cuda", enabled=amp and DEVICE == "cuda")
     hist = []
     for s in range(steps):
         deck = sample_decks(C, B)
         enc = sample_conditions(C, B)
         hp = torch.rand(B, device=DEVICE) * 65 + 12
         out = _rl_step(C, policy, V, opt, sched, optv, deck, enc, hp, ef, eidx,
-                       micro_B=micro_B)
+                       micro_B=micro_B, scaler=scaler)
         if s % eval_every == 0 or s == steps - 1:
             ev = eval_combat(C, policy)
             hist.append((s, out["won"].mean().item(), ev["win"], ev["dhp"]))
@@ -199,7 +212,7 @@ def refine_value(C, policy, V, steps=200, B=256, lr=5e-4, verbose=True):
 
 def finetune_on_runs(C, policy, V, meta, steps=300, B=128, harvest_runs=3,
                      harvest_B=512, mix=0.5, lr_pi=3e-4, eval_every=50,
-                     micro_B=64, verbose=True):
+                     micro_B=64, amp=False, verbose=True):
     """Stage 2: fine-tune the combat agent on the decks the meta agent
     ACTUALLY builds (harvested from full runs), mixed 50/50 with broad
     samples to protect coverage."""
@@ -215,6 +228,7 @@ def finetune_on_runs(C, policy, V, meta, steps=300, B=128, harvest_runs=3,
     ef, eidx = encounter_features(C)
     opt, sched = make_optim(policy.parameters(), lr_pi, steps)
     optv = torch.optim.Adam(V.parameters(), lr=5e-4)
+    scaler = torch.amp.GradScaler("cuda", enabled=amp and DEVICE == "cuda")
     hist = []
     for s in range(steps):
         if torch.rand(1).item() < mix and snaps:
@@ -231,7 +245,7 @@ def finetune_on_runs(C, policy, V, meta, steps=300, B=128, harvest_runs=3,
             enc = sample_conditions(C, B)
             hp = torch.rand(B, device=DEVICE) * 65 + 12
         out = _rl_step(C, policy, V, opt, sched, optv, deck, enc, hp, ef, eidx,
-                       micro_B=micro_B)
+                       micro_B=micro_B, scaler=scaler)
         if s % eval_every == 0 or s == steps - 1:
             ev = eval_combat(C, policy)
             hist.append((s, ev["win"], ev["dhp"]))
