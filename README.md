@@ -107,3 +107,24 @@ run HP cap.
 GPU notes: policy logp graphs accumulate over every play of every turn;
 memory scales with B x N x E_MAX x hidden. B=128-256 with h=64 fits
 comfortably on a T4; drop B before dropping h.
+
+## Findings log (STS era)
+
+7. The frac value head (fraction of enemy HP dealt) restored HP-conditional
+   campfire resting -- P(rest) 0.96/0.39/0.01 across low/mid/high HP -- by
+   giving V an HP-gradient where P(death) saturates (bosses). Correct
+   direction this time, unlike v3a's inversion.
+8. Meta drafting is worth +15pp run-win over random on the canon-length act
+   (17.6% vs 2.4%); never-draft cannot win at all.
+9. SCALING NEGATIVE RESULT: 4x width / 3x depth on the factorized MLP moved
+   the boss win rate not at all (0.047 / 0.036 / 0.057). Capacity is not the
+   binding constraint; information is -- the per-card scorer never sees the
+   rest of the hand. Hence:
+10. TokenCombatPolicy: set transformer over per-INSTANCE card tokens in all
+    four zones (segment embeddings; repeats are separate tokens), enemy
+    tokens with type identity + full power vector, a state token, and a
+    learned END-TURN token; shared-QK head scattered amax onto the
+    (155 x 6) action grid, learned sink for untargeted cards, drop-in via
+    the same forward(C, st, mask) contract. Fine-tuning on harvested real
+    decks bought ~nothing while sample_decks matched the meta's taste (the
+    v2 DAgger lesson, again).

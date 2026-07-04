@@ -229,3 +229,29 @@ def test_pipeline_smoke():
     meta, _ = sts.train_meta(C, V, steps=2, B=32, verbose=False)
     r = sts.simulate_runs(C, policy, meta, B=24)
     assert 0.0 <= r["win"] <= 1.0
+
+
+def test_token_policy_contract():
+    """TokenCombatPolicy: instance builder is a faithful expansion, forward
+    honors the engine contract, sampling never picks illegal actions, and a
+    checkpointed training step runs."""
+    from deckbuilder.sts.agents import TokenCombatPolicy, build_instances
+    p = TokenCombatPolicy(C, d=32, n_layers=1)
+    st = fresh("gremlin_gang", deck_of(strike=3, defend=2, bash=1))
+    engine.start_player_turn(C, st, first_turn=True)
+    rows, zones = build_instances(C, st)
+    # every zone count is reproduced exactly as instance tokens
+    for zi, zk in enumerate(("hand", "draw", "disc", "exh")):
+        for r in (C.card_row["strike"], C.card_row["defend"], C.card_row["bash"]):
+            want = int(st[zk][0, r].round())
+            got = int(((rows[0] == r) & (zones[0] == zi)).sum())
+            assert got == want, (zk, r, got, want)
+    mask = engine.legal_actions(C, st)
+    logits = p(C, st, mask)
+    assert logits.shape == (B, C.N * 6 + 1)
+    masked = logits.masked_fill(~mask, torch.finfo(logits.dtype).min)
+    a = torch.distributions.Categorical(logits=masked).sample((32,))
+    assert bool(mask.gather(1, a.T).all())
+    pol, V_, _ = sts.train_combat(C, steps=2, B=12, micro_B=6, eval_every=1,
+                                  policy=TokenCombatPolicy(C, d=32, n_layers=1),
+                                  verbose=False)

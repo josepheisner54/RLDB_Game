@@ -11,7 +11,7 @@ from .engine import combat, new_combat, legal_actions
 from .encounters import spawn_encounter
 from .rewards import roll_offers, apply_pick, init_pity
 from .runsim import simulate_runs, DEFAULT_FLOORS
-from .agents import CombatPolicy, RandomPolicy, ValueNet, MetaAgent, \
-    encounter_features
+from .agents import CombatPolicy, RandomPolicy, TokenCombatPolicy, \
+    ValueNet, MetaAgent, encounter_features, build_instances
 from .training import train_combat, refine_value, train_meta, eval_combat, \
     sample_decks, sample_conditions, finetune_on_runs, eval_by_pool
