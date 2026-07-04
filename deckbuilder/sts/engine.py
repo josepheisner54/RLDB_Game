@@ -670,7 +670,7 @@ def player_turn(C, st, policy=None, collect_logp=False):
             logits[:, -1] = -0.5
         else:
             logits = policy(C, st, mask)
-        logits = logits.masked_fill(~mask, -1e9)
+        logits = logits.masked_fill(~mask, torch.finfo(logits.dtype).min)
         dist = torch.distributions.Categorical(logits=logits)
         a = dist.sample()
         if collect_logp:
