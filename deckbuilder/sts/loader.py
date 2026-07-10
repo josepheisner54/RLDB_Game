@@ -320,19 +320,59 @@ def load(ascension=0, content_dir=None):
                                   for n in C.NAMES]).to(DEVICE)
     C.ATTACK_ROWS = (C.CTYPE == CT_ATTACK)
 
-    # agent-facing card features, derived from programs
+    # agent-facing card features, derived from programs.
+    # RICH NAIVE EMBEDDING: identity should be DERIVABLE from features, not
+    # memorized -- per-power signed amounts, created-status identity,
+    # self-HP costs, and mechanic flags close the gaps that ID tables were
+    # silently covering (the Demon Form OOD lesson).
     dmg_est = torch.zeros(C.N); hits_est = torch.ones(C.N)
     blk_est = torch.zeros(C.N); draw_est = torch.zeros(C.N)
     pw_est = torch.zeros(C.N); nrg_est = torch.zeros(C.N)
+    pow_vec = torch.zeros(C.N, P)                 # signed amount per power
+    made = torch.zeros(C.N, C.NS)                 # which statuses it creates
+    made_to_hand = torch.zeros(C.N)
+    selfhp = torch.zeros(C.N); heal_amt = torch.zeros(C.N)
+    maxhp = torch.zeros(C.N)
+    FLAG_OPS = ["exhaust_random", "exhaust_hand", "move_discard_to_draw",
+                "move_exhaust_to_hand", "play_top_card", "copy_in_hand",
+                "upgrade_in_hand", "rampage_grow", "multiply_block",
+                "multiply_power", "block_per_captured",
+                "generate_random_card"]
+    opflags = torch.zeros(C.N, len(FLAG_OPS))
+    dyn_block = torch.zeros(C.N); dyn_perf = torch.zeros(C.N)
+    cnd_vuln = torch.zeros(C.N); cnd_intent = torch.zeros(C.N)
     for r in range(C.N):
-        for k in range(MAX_FX):
-            o = int(prog[r, k, 0]); a = float(prog[r, k, 1])
-            if o == OP["damage"] and a > 0:
-                dmg_est[r] += a; hits_est[r] = max(hits_est[r].item(), prog[r, k, 2].item())
-            if o == OP["gain_block"] and a > 0: blk_est[r] += a
-            if o == OP["draw"]: draw_est[r] += a
-            if o == OP["apply_power"]: pw_est[r] += abs(a)
-            if o == OP["gain_energy"]: nrg_est[r] += a
+        for pr in (prog[r], eot_prog[r]):
+            for k in range(MAX_FX):
+                o = int(pr[k, 0]); a = float(pr[k, 1])
+                if o == OP["damage"] and a > 0:
+                    dmg_est[r] += a
+                    hits_est[r] = max(hits_est[r].item(), pr[k, 2].item())
+                if o == OP["gain_block"] and a > 0: blk_est[r] += a
+                if o == OP["draw"]: draw_est[r] += a
+                if o == OP["apply_power"]:
+                    pw_est[r] += abs(a)
+                    pow_vec[r, int(pr[k, 3])] += a
+                if o == OP["gain_energy"]: nrg_est[r] += a
+                if o == OP["create_card"]:
+                    cr = int(pr[k, 3])
+                    if cr >= 2 * M:
+                        made[r, cr - 2 * M] += max(a, 1.0)
+                    if int(pr[k, 5]) == DEST_HAND: made_to_hand[r] = 1.0
+                if o in (OP["lose_hp"], OP["damage_self"]) and a > 0:
+                    selfhp[r] += a
+                if o == OP["heal"]: heal_amt[r] += a
+                if o == OP["gain_max_hp"]: maxhp[r] += a
+                for fi, fo in enumerate(FLAG_OPS):
+                    if o == OP[fo]: opflags[r, fi] = 1.0
+                if a == AMT_PLAYER_BLOCK: dyn_block[r] = 1.0
+                if a == AMT_PERFECTED: dyn_perf[r] = 1.0
+                if int(pr[k, 6]) == CND_TGT_VULN: cnd_vuln[r] = 1.0
+                if int(pr[k, 6]) == CND_TGT_INTENT_ATK: cnd_intent[r] = 1.0
+                if int(pr[k, 6]) == CND_FATAL and o == OP["gain_max_hp"]:
+                    maxhp[r] += 0.0            # already counted; flag via fatal
+    fatal = torch.tensor([1.0 if (prog[r, :, 6] == CND_FATAL).any() else 0.0
+                          for r in range(C.N)])
     tf = torch.nn.functional.one_hot(ctype, 4).float()
     C.CARD_FEATS = torch.cat([
         (cost.clamp(min=0) / 3).unsqueeze(1), (cost == -1).float().unsqueeze(1),
@@ -342,6 +382,15 @@ def load(ascension=0, content_dir=None):
         tf, exha.unsqueeze(1), ether.unsqueeze(1), targeted.unsqueeze(1),
         (rar.float() / 4).unsqueeze(1), unplay.unsqueeze(1),
         torch.cat([torch.zeros(M), torch.ones(M), torch.zeros(C.NS)]).unsqueeze(1),
+        pow_vec / 4.0,                     # 34: WHICH power, signed amount
+        made,                              # 5: which statuses it creates
+        made_to_hand.unsqueeze(1),
+        (selfhp / 6).unsqueeze(1), (heal_amt / 6).unsqueeze(1),
+        (maxhp / 4).unsqueeze(1), fatal.unsqueeze(1),
+        opflags,                           # 12 mechanic flags
+        dyn_block.unsqueeze(1), dyn_perf.unsqueeze(1),
+        cnd_vuln.unsqueeze(1), cnd_intent.unsqueeze(1),
+        innate.unsqueeze(1), clash.unsqueeze(1),
     ], dim=1).to(DEVICE)
     C.FEAT_DIM = C.CARD_FEATS.shape[1]
 

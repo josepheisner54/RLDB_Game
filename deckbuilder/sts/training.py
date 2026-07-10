@@ -42,7 +42,11 @@ def sample_conditions(C, B, pool_weights=None):
     return enc_ids
 
 
-def sample_decks(C, B, max_drafts=8, upgrade_p=0.4, wound_p=0.15):
+def sample_decks(C, B, max_drafts=8, upgrade_p=0.4, wound_p=0.15,
+                 rare_p=0.25):
+    """rare_p: chance a deck gets one uniform-random RARE seeded in,
+    bypassing pity. Pity models the game; it must not starve training --
+    the decks that beat bosses are exactly the decks with rares in them."""
     deck = C.STARTER.unsqueeze(0).repeat(B, 1)
     k = torch.randint(0, max_drafts + 1, (B,), device=DEVICE)
     pity = init_pity(B)
@@ -61,6 +65,10 @@ def sample_decks(C, B, max_drafts=8, upgrade_p=0.4, wound_p=0.15):
     wounds = (torch.rand(B, device=DEVICE) < wound_p).float() \
         * torch.randint(1, 3, (B,), device=DEVICE).float()
     deck[:, C.card_row["wound"]] += wounds
+    rares = torch.tensor(C.POOL["rare"], device=DEVICE)
+    pick = rares[torch.randint(0, len(rares), (B,), device=DEVICE)]
+    seed = (torch.rand(B, device=DEVICE) < rare_p).float()
+    deck = deck + F.one_hot(pick, C.N).float() * seed.unsqueeze(-1)
     return deck
 
 

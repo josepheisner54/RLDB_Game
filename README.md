@@ -128,3 +128,12 @@ comfortably on a T4; drop B before dropping h.
     the same forward(C, st, mask) contract. Fine-tuning on harvested real
     decks bought ~nothing while sample_decks matched the meta's taste (the
     v2 DAgger lesson, again).
+11. THE DEMON FORM LESSON: architectures tied on rare-free decks (0.24 vs
+    0.26 boss win), but the feature-pure MLP converted one Demon Form into
+    +25pp (0.51) while the transformer barely exploited it (0.30) -- its
+    randomly-initialized ID embedding for a pity-starved rare drowned the
+    feature signal. Fixes: zero-init ID tables (unseen = contributes
+    nothing), a rich naive embedding (per-power signed amounts, created-
+    status identity, self-HP costs, mechanic flags -- identity should be
+    derivable, not memorized), and rare-boosted training decks (pity models
+    the game; it must not starve training).

@@ -287,6 +287,12 @@ class TokenCombatPolicy(nn.Module):
         self.zone_emb = nn.Embedding(len(ZONE_KEYS), d)
         self.enemy_proj = nn.Linear(DT + 34, d)
         self.enemy_id = nn.Embedding(25, d)
+        # zero-init identities: an UNSEEN card/enemy contributes exactly
+        # nothing (graceful fallback to pure features); covered ones still
+        # learn residual identity. The Demon Form lesson: random-init IDs
+        # drown the feature signal on pity-starved rares.
+        nn.init.zeros_(self.card_id.weight)
+        nn.init.zeros_(self.enemy_id.weight)
         self.state_proj = nn.Linear(DS, d)
         self.end_turn = nn.Parameter(torch.randn(d) * 0.02)
         enc = nn.TransformerEncoderLayer(d, n_heads, dim_feedforward=2 * d,
